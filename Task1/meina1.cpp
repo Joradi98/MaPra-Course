@@ -85,28 +85,33 @@ void handleCompleteQuadraticPolynomial(Polynomial &poly){
     double q = poly.c / poly.a;
     double pHalf = p / 2;
 	
+    bool DEBUG_MAX_CHECK = true;
+
     complex<double> pqRoot;
     // if p big number, factorise abs(p) to avoid overflow
     // check, whether (p/2)^2 will be bigger than DBL_MAX
-    if( pHalf > sqrt(DBL_MAX) ){
-        complex<double> square( (1/4) - (q/p)/p , 0 );
-        pqRoot = abs(p) * sqrt(square);
+    if(abs(pHalf) > sqrt(DBL_MAX + abs(q)) || DEBUG_MAX_CHECK){
+        complex<double> radicand((1/4) - (q/(p * p)), 0);
+        pqRoot = abs(p) * sqrt(radicand);
     }
     else {
-        complex<double> square( (pHalf * pHalf) - q, 0 );
-        pqRoot = sqrt(square);
+        complex<double> radicand((pHalf * pHalf) - q, 0);
+        pqRoot = sqrt(radicand);
     }
 			
-    cout << "pq: " << pqRoot << endl;
+    cout << "pqRoot: " << pqRoot << endl;
     complex<double> zero1, zero2;
 
     // use Vieta to avoid cancellation: q = zero1*zero2;
-    // Zero can be factorized out of the polynomial: f(x)=x^2+px+q => q = 0 => f(x)=x*(x+p)
-    zero2 = complex<double>(-pHalf,0) - pqRoot;
-    if (zero2 == 0.0) {
-        zero1 = q / zero2;
+    // Zero can be factorized out of the polynomial: f(x)=x^2+px+q & q = 0 => f(x)=x*(x+p)
+    // firstZeroFactor defines if the first zero should be p/2 - sqrt or p/2 + sqrt to avoid cancellation
+    double firstZeroFactor = 1;
+    if(p > 0) firstZeroFactor = -1; 
+    zero1 = complex<double>(-pHalf,0) + firstZeroFactor * pqRoot;
+    if (zero1 != 0.0) {
+        zero2 = q / zero1;
     } else {
-        zero1 = -p;
+        zero2 = -p;
     }
     
     
@@ -115,7 +120,7 @@ void handleCompleteQuadraticPolynomial(Polynomial &poly){
     // check for complex values, as this requires another parameter in Ergebnis()
     if (zero1.imag() != 0.0) {
         // pass the real and imaginary part to the Ergebnis-function
-        Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
+        Ergebnis(2, true, zero1.real(), abs( zero1.imag()));
     } 
     else {
         Ergebnis(2, false, zero1.real(), zero2.real());
