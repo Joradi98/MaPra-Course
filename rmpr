@@ -1,0 +1,4 @@
+echo "**** compiling and running Mapra ****"
+echo ""
+g++ -o TestProgram meina1.cpp unit.o
+./TestProgram
