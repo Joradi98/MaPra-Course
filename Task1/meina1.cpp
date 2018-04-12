@@ -21,7 +21,7 @@ using namespace std;
 
 // represents a Polynomial f(x) = ax^2 + bx + c with a, b, c in R
 class Polynomial {
-	public:
+public:
 	    Polynomial(double a, double b, double c);
 		bool isConstant();
 		bool isLinear();	
