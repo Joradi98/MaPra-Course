@@ -68,10 +68,16 @@ void handleLinearPolynomial(Polynomial &poly){
 
 void handleBZeroPolynomial(Polynomial &poly){
     // polynomial is of type f(x)=ax^2+c
-    complex<double> square = complex<double>( -poly.c / poly.a, 0 );
-    complex<double> zero1 = sqrt(square);
-    cout << "two zeros. zero1: " << zero1 << " and its conjugate" << endl;
-    Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
+    if(poly.c == 0){
+        //polynomial has only one zero: 0
+        Ergebnis(1, false, 0);
+    }
+    else {
+        complex<double> square = complex<double>( -poly.c / poly.a, 0 );
+        complex<double> zero1 = sqrt(square);
+        cout << "two zeros. zero1: " << zero1 << " and its conjugate" << endl;
+        Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
+    }
 }
 
 void handleCompleteQuadraticPolynomial(Polynomial &poly){
@@ -95,7 +101,7 @@ void handleCompleteQuadraticPolynomial(Polynomial &poly){
     complex<double> zero1, zero2;
 
     // use Vieta to avoid cancellation: q = zero1*zero2;
-    //Zero can be factorized out of the polynomial: f(x)=x^2+px+q => q = 0 => f(x)=x*(x+p)
+    // Zero can be factorized out of the polynomial: f(x)=x^2+px+q => q = 0 => f(x)=x*(x+p)
     zero2 = complex<double>(-pHalf,0) - pqRoot;
     if (zero2 == 0) {
         zero1 = q / zero2;
