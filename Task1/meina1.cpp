@@ -73,10 +73,16 @@ void handleBZeroPolynomial(Polynomial &poly){
         Ergebnis(1, false, 0);
     }
     else {
+        //polynomial has "symmetrical" zeros
         complex<double> square = complex<double>( -poly.c / poly.a, 0 );
         complex<double> zero1 = sqrt(square);
         cout << "two zeros. zero1: " << zero1 << " and its conjugate" << endl;
-        Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
+        if(zero1.imag() == 0.0){
+            Ergebnis(2, false, zero1.real(), -zero1.real());
+        }
+        else {
+            Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
+        }
     }
 }
 
@@ -91,8 +97,9 @@ void handleCompleteQuadraticPolynomial(Polynomial &poly){
     // if p big number, factorise abs(p) to avoid overflow
     // check, whether (p/2)^2 will be bigger than DBL_MAX
     if(abs(pHalf) > sqrt(DBL_MAX + abs(q)) || DEBUG_MAX_CHECK){
-        complex<double> radicand((1/4) - (q/(p * p)), 0);
+        complex<double> radicand((1.0/4.0) - ((q/p)/p), 0);
         pqRoot = abs(p) * sqrt(radicand);
+        cout << "[DEBUG] p: " << p << ", q: " << q << ", radicand: " << radicand << endl;
     }
     else {
         complex<double> radicand((pHalf * pHalf) - q, 0);
