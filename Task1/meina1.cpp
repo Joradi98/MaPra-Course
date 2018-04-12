@@ -47,83 +47,123 @@ bool Polynomial::isZeroPolynomial(){
     return isConstant() && c == 0;
 }
 
+void handleZeroPolynomial(Polynomial &poly){
+    if(poly.isZeroPolynomial()) cout << "Infinite many zeros." << endl;
+    else cout << "no zeros." << endl;
+    Ergebnis(0);
+}
 
+void handleLinearPolynomial(Polynomial &poly){
+    // there is only one zero
+    double zero = -poly.c / poly.b;
+    cout << "one zero: " << zero << endl;
+    // this single zero will always be real
+    Ergebnis(1,false,zero);    
+}
+
+void handleBZeroPolynomial(Polynomial &poly){
+    // polynomial is of type f(x)=ax^2+c
+    complex<double> square = complex<double>( -poly.c / poly.a, 0 );
+    complex<double> zero1 = sqrt(square);
+    cout << "two zeros. zero1: " << zero1 << " and its conjugate" <<"\n";
+    Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
+}
+
+void handleCompleteQuadraticPolynomial(Polynomial &poly){
+    // .. it should be quadratic
+    double p = poly.b / poly.a;
+    double q = poly.c / poly.a;
+    double pHalf = p / 2;
+	
+    complex<double> pqRoot;
+    // if p big number, factorise abs(p) to avoid overflow
+    // check, whether (p/2)^2 will be bigger than DBL_MAX
+    if( pHalf > sqrt(DBL_MAX) ){
+        complex<double> square( (pHalf * pHalf) - q, 0 );
+        pqRoot = sqrt(square);
+    }
+    else {
+        complex<double> square( (1/4) - (q/p)/p , 0 );
+        pqRoot = abs(p) * sqrt(square);
+    }
+			
+    cout << "pq: " << pqRoot << endl;
+    complex<double> zero1, zero2;
+
+    // use Vieta to avoid cancellation
+    if(p > 0){
+        zero2 = complex<double>(-pHalf,0) - pqRoot;
+        zero1 = q / zero2;
+    }
+    else {
+        zero1 = complex<double>(-pHalf,0) + pqRoot;
+        zero2 = q / zero1;
+    }
+    cout << "two zeros. zero1: " << zero1 << ", zero2: " << zero2 << "\n";
+        
+    // check for complex values, as this requires another parameter in Ergebnis()
+    if (zero1.imag() != 0) {
+        // pass the real and imaginary part to the Ergebnis-function
+        Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
+    } 
+    else {
+        Ergebnis(2, false, zero1.real(), zero2.real());
+    }        
+}
 
 void calculateZeros(Polynomial &poly){
     cout << "calculating zeros of f: R -> R, f(x) = " << poly.a << "x^2 + " << poly.b << "x + " << poly.c << endl;
     if(poly.isConstant()){
-        if(poly.isZeroPolynomial()) cout << "Infinite many zeros." << endl;
-        else cout << "no zeros." << endl;
-        Ergebnis(0);
+        handleZeroPolynomial(poly);
     }
     else if(poly.isLinear()){
-        // there is only one zero
-        double zero = -poly.c / poly.b;
-        cout << "one zero: " << zero << endl;
-  
-        // this single zero will always be real
-        Ergebnis(1,false,zero);
+        handleLinearPolynomial(poly);
     }
     else if(poly.b == 0){
-        // polynomial is of type f(x)=ax^2+c
-        complex<double> square = complex<double>( -poly.c / poly.a, 0 );
-        complex<double> zero1 = sqrt(square);
-        cout << "two zeros. zero1: " << zero1 << " and its conjugate" <<"\n";
-        Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
+        handleBZeroPolynomial(poly);
     }
     else{
-        // .. it should be quadratic
-        double p = poly.b / poly.a;
-        double q = poly.c / poly.a;
-        double pHalf = p / 2;
-		
-        complex<double> pqRoot;
-        // if p big number, factorise abs(p) to avoid overflow
-        // check, whether (p/2)^2 will be bigger than DBL_MAX
-        if( pHalf > sqrt(DBL_MAX) ){
-            complex<double> square( (pHalf * pHalf) - q, 0 );
-            pqRoot = sqrt(square);
-        }
-        else {
-            complex<double> square( (1/4) - (q/p)/p , 0 );
-            pqRoot = abs(p) * sqrt(square);
-        }
-			
-        cout << "pq: " << pqRoot << endl;
-        complex<double> zero1, zero2;
-		
-        // use Vieta to avoid cancellation
-        if(p > 0){
-            zero2 = complex<double>(-pHalf,0) - pqRoot;
-            zero1 = q / zero2;
-        }
-        else {
-            zero1 = complex<double>(-pHalf,0) + pqRoot;
-            zero2 = q / zero1;
-        }
-        cout << "two zeros. zero1: " << zero1 << ", zero2: " << zero2 << "\n";
-        
-        // check for complex values, as this requires another parameter in Ergebnis()
-        if (zero1.imag() != 0) {
-            // pass the real and imaginary part to the Ergebnis-function
-            Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
-        } 
-        else {
-            Ergebnis(2, false, zero1.real(), zero2.real());
-        }        
+        handleCompleteQuadraticPolynomial(poly);
     }
 }
 
+bool isInteger(string s){
+    for(char c : s){
+        if(!isdigit(c)) return false;
+    }
+    return true;
+}
 
 int main(){
-
+    cout << "What would you like to do?" << endl;
+    cout << "  manual: manually specify coefficients" << endl;
+    cout << "  1-" << AnzahlBeispiele << ":   test n-th polynomial from unit.o" << endl;
+    cout << "  all:    test all polynomials from unit.o" << endl;
+    string command;    
+    cin >> command;
     double a, b, c;
-    Start(1, a, b, c);
-    
-
-    Polynomial p(a, b, c);
-	calculateZeros(p);
-    
-    
+    if(command == "manual"){
+        cout << "specify values for the coefficients:" << endl;
+        cout << "a: "; cin >> a;
+        cout << "b: "; cin >> b;
+        cout << "c: "; cin >> c;
+        Polynomial p(a, b, c);
+        calculateZeros(p);
+    }
+    else if(command == "all"){
+        for(int i = 0; i < AnzahlBeispiele; i++){
+            Start(i + 1, a, b, c);
+            Polynomial p(a, b, c);
+            calculateZeros(p);
+        }
+    }
+    else if(isInteger(command)){
+        Start(stoi(command), a, b, c);
+        Polynomial p(a, b, c);
+        calculateZeros(p);
+    }
+    else {
+        cout << "unknown command. exiting.." << endl;
+    }
     return 0;
 }
