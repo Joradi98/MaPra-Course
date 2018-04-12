@@ -23,7 +23,7 @@ using namespace std;
 class Polynomial {
     public:
         Polynomial(double a, double b, double c);
-        bool isConstant();
+    bool isConstant();
         bool isLinear();	
         bool isZeroPolynomial();
         double a, b, c;
