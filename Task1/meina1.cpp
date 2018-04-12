@@ -21,14 +21,14 @@ using namespace std;
 // represents a Polynomial f(x) = ax^2 + bx + c with a, b, c in R
 class Polynomial {
 	public:
-		Polynomial(float a, float b, float c);
+		Polynomial(double a, double b, double c);
 		bool isConstant();
 		bool isLinear();	
 		bool isZeroPolynomial();
-		float a, b, c;
+		double a, b, c;
 };
 
-Polynomial::Polynomial(float a, float b, float c){
+Polynomial::Polynomial(double a, double b, double c){
 	this -> a = a;
 	this -> b = b;
 	this -> c = c;
@@ -52,20 +52,22 @@ void calculateZeros(Polynomial &poly){
 	if(poly.isConstant()){
 		if(poly.isZeroPolynomial()) cout << "Infinite many zeros." << endl;
 		else cout << "no zeros." << endl;
+        Ergebnis(0);
 	}
 	else if(poly.isLinear()){
 		// there is only one zero
-		float zero = -poly.c / poly.b;
+		double zero = -poly.c / poly.b;
 		cout << "one zero: " << zero << endl;
+        Ergebnis(1,false,zero)
 	}
 	else { 
 		// .. it should be quadratic
-		float p = poly.b / poly.a;
-		float q = poly.c / poly.a;
-		float pHalf = p / 2;
+		double p = poly.b / poly.a;
+		double q = poly.c / poly.a;
+		double pHalf = p / 2;
 		
 		
-		float pqRoot;
+		double pqRoot;
 		// if p big number, factorise abs(p) to avoid overflow
 		// TODO: maybe something greater than 1?
 		if(abs(p) <= 1){
@@ -76,7 +78,7 @@ void calculateZeros(Polynomial &poly){
 		}
 			
 
-		float zero1, zero2;
+		double zero1, zero2;
 		
 		// use Vieta to avoid cancellation
 		// TODO: there is a problem if there is a "zero zero"
@@ -100,6 +102,7 @@ int main(){
 	Start(1, a, b, c);
 	cout << a << ", " << b << ", " << c << endl; */
 
+    
 	Polynomial p(4, 0, 0);
 	calculateZeros(p);
 	return 0;
