@@ -13,6 +13,7 @@
 
 #include "unit.h"
 #include <iostream>
+#include <complex>
 
 using namespace std;
 
@@ -52,13 +53,14 @@ void calculateZeros(Polynomial &poly){
 	if(poly.isConstant()){
 		if(poly.isZeroPolynomial()) cout << "Infinite many zeros." << endl;
 		else cout << "no zeros." << endl;
-        Ergebnis(0);
+      //  Ergebnis(0);
 	}
 	else if(poly.isLinear()){
 		// there is only one zero
 		double zero = -poly.c / poly.b;
 		cout << "one zero: " << zero << endl;
-        Ergebnis(1,false,zero)
+        // this single zero will always be real
+      //  Ergebnis(1,false,zero);
 	}
 	else { 
 		// .. it should be quadratic
@@ -66,31 +68,37 @@ void calculateZeros(Polynomial &poly){
 		double q = poly.c / poly.a;
 		double pHalf = p / 2;
 		
-		
-		double pqRoot;
+        complex<double> pqRoot;
 		// if p big number, factorise abs(p) to avoid overflow
 		// TODO: maybe something greater than 1?
 		if(abs(p) <= 1){
-			pqRoot = sqrt((pHalf * pHalf) - q);
+            
+            
+            complex<double> square( (pHalf * pHalf) - q, 0 );
+            pqRoot = sqrt(square);
 		}
 		else {
-			pqRoot = abs(p) * sqrt((1/4) - (q/p)/p);
-		}
+            complex<double> square( (1/4) - (q/p)/p , 0 );
+            pqRoot = abs(p) * sqrt(square);
+
+        }
 			
 
-		double zero1, zero2;
+		complex<double> zero1, zero2;
 		
 		// use Vieta to avoid cancellation
-		// TODO: there is a problem if there is a "zero zero"
 		if(p > 0){
-			zero2 = -pHalf - pqRoot;
+			zero2 = complex<double>(-pHalf,0) - pqRoot;
 			zero1 = q / zero2;
 		}
 		else {
-			zero1 = -pHalf + pqRoot;
+			zero1 = complex<double>(-pHalf,0) + pqRoot;
 			zero2 = q / zero1;
 		}
-		cout << "two zeros. zero1: " << zero1 << ", zero2: " << zero2;
+		cout << "two zeros. zero1: " << zero1 << ", zero2: " << zero2 << "\n";
+        
+        
+        
 	}
 }
 
@@ -103,8 +111,15 @@ int main(){
 	cout << a << ", " << b << ", " << c << endl; */
 
     
-	Polynomial p(4, 0, 0);
+	Polynomial p(1, 0, 1);
 	calculateZeros(p);
+    
+    complex<double> i(0,1);
+    complex<double> z4(-1,0);
+    z4 = sqrt(z4);
+    cout << z4 << "\n";
+
+    
 	return 0;
 	
 	// TODO: call unit.Ergebnis() 
