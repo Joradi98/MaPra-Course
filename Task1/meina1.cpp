@@ -53,16 +53,25 @@ void calculateZeros(Polynomial &poly){
 	if(poly.isConstant()){
 		if(poly.isZeroPolynomial()) cout << "Infinite many zeros." << endl;
 		else cout << "no zeros." << endl;
-      //  Ergebnis(0);
+        Ergebnis(0);
 	}
 	else if(poly.isLinear()){
 		// there is only one zero
 		double zero = -poly.c / poly.b;
 		cout << "one zero: " << zero << endl;
+        
         // this single zero will always be real
-      //  Ergebnis(1,false,zero);
+        Ergebnis(1,false,zero);
 	}
-	else { 
+    else if(poly.b == 0){
+        // polynomial is of type f(x)=ax^2+c
+        complex<double> square = complex<double>( -poly.c / poly.a, 0 );
+        complex<double> zero1 = sqrt(square);
+        cout << "two zeros. zero1: " << zero1 << " and its conjugate" <<"\n";
+        Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
+
+    }
+	else{
 		// .. it should be quadratic
 		double p = poly.b / poly.a;
 		double q = poly.c / poly.a;
@@ -70,19 +79,17 @@ void calculateZeros(Polynomial &poly){
 		
         complex<double> pqRoot;
 		// if p big number, factorise abs(p) to avoid overflow
-		// TODO: maybe something greater than 1?
-		if(abs(p) <= 1){
-            
-            
+		// check, whether (p/2)^2 will be bigger than DBL_MAX
+		if( pHalf > sqrt(DBL_MAX) ){
             complex<double> square( (pHalf * pHalf) - q, 0 );
             pqRoot = sqrt(square);
 		}
 		else {
             complex<double> square( (1/4) - (q/p)/p , 0 );
             pqRoot = abs(p) * sqrt(square);
-
         }
 			
+        cout << "pq: " << pqRoot << endl;
 
 		complex<double> zero1, zero2;
 		
@@ -97,30 +104,23 @@ void calculateZeros(Polynomial &poly){
 		}
 		cout << "two zeros. zero1: " << zero1 << ", zero2: " << zero2 << "\n";
         
-        
+        // check for complex values, as this requires another parameter in Ergebnis()
+        if (zero1.imag() != 0) {
+            // pass the real and imaginary part to the Ergebnis-function
+            Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
+        } else {
+            Ergebnis(2, false, zero1.real(), zero2.real());
+        }
         
 	}
 }
 
 
 int main(){
-/*
-	int x = 5;
-	double a, b, c;
-	Start(1, a, b, c);
-	cout << a << ", " << b << ", " << c << endl; */
 
-    
-	Polynomial p(1, 0, 1);
+    Polynomial p(1, 0, 1);
 	calculateZeros(p);
     
-    complex<double> i(0,1);
-    complex<double> z4(-1,0);
-    z4 = sqrt(z4);
-    cout << z4 << "\n";
-
     
 	return 0;
-	
-	// TODO: call unit.Ergebnis() 
 }
