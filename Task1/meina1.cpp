@@ -91,7 +91,7 @@ void handleCompleteQuadraticPolynomial(Polynomial &poly){
     double q = poly.c / poly.a;
     double pHalf = p / 2;
 	
-    bool DEBUG_MAX_CHECK = true;
+    bool DEBUG_MAX_CHECK = false;
 
     complex<double> pqRoot;
     // if p big number, factorise abs(p) to avoid overflow
