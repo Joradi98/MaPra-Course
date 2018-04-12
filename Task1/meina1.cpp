@@ -102,7 +102,12 @@ void handleCompleteQuadraticPolynomial(Polynomial &poly){
 
     // use Vieta to avoid cancellation: q = zero1*zero2;
     // Zero can be factorized out of the polynomial: f(x)=x^2+px+q => q = 0 => f(x)=x*(x+p)
-    zero2 = complex<double>(-pHalf,0) - pqRoot;
+    if ( p < 0) {
+        zero2 = complex<double>(-pHalf,0) + pqRoot;
+    } else {
+        zero2 = complex<double>(-pHalf,0) - pqRoot;
+    }
+
     if (zero2 == 0.0) {
         zero1 = q / zero2;
     } else {
