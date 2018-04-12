@@ -103,7 +103,7 @@ void handleCompleteQuadraticPolynomial(Polynomial &poly){
     // use Vieta to avoid cancellation: q = zero1*zero2;
     // Zero can be factorized out of the polynomial: f(x)=x^2+px+q => q = 0 => f(x)=x*(x+p)
     zero2 = complex<double>(-pHalf,0) - pqRoot;
-    if (zero2 == 0) {
+    if (zero2 == 0.0) {
         zero1 = q / zero2;
     } else {
         zero1 = -p;
@@ -113,7 +113,7 @@ void handleCompleteQuadraticPolynomial(Polynomial &poly){
     cout << "two zeros. zero1: " << zero1 << ", zero2: " << zero2 << "\n";
         
     // check for complex values, as this requires another parameter in Ergebnis()
-    if (zero1.imag() != 0) {
+    if (zero1.imag() != 0.0) {
         // pass the real and imaginary part to the Ergebnis-function
         Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
     } 
