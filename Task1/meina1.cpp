@@ -36,25 +36,25 @@ Polynomial::Polynomial(double a, double b, double c){
 }
 
 bool Polynomial::isConstant(){
-	return a == 0 && b == 0;
+    return a == 0 && b == 0;
 }
 
 bool Polynomial::isLinear(){
-	return a == 0;
+    return a == 0;
 }
 
 bool Polynomial::isZeroPolynomial(){
-	return isConstant() && c == 0;
+    return isConstant() && c == 0;
 }
 
 
 
 void calculateZeros(Polynomial &poly){
-	if(poly.isConstant()){
-		if(poly.isZeroPolynomial()) cout << "Infinite many zeros." << endl;
-		else cout << "no zeros." << endl;
+    if(poly.isConstant()){
+	    if(poly.isZeroPolynomial()) cout << "Infinite many zeros." << endl;
+	    else cout << "no zeros." << endl;
         Ergebnis(0);
-	}
+    }
 	else if(poly.isLinear()){
 		// there is only one zero
 		double zero = -poly.c / poly.b;
