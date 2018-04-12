@@ -70,7 +70,7 @@ void handleBZeroPolynomial(Polynomial &poly){
     // polynomial is of type f(x)=ax^2+c
     complex<double> square = complex<double>( -poly.c / poly.a, 0 );
     complex<double> zero1 = sqrt(square);
-    cout << "two zeros. zero1: " << zero1 << " and its conjugate" <<"\n";
+    cout << "two zeros. zero1: " << zero1 << " and its conjugate" << endl;
     Ergebnis(2, true, zero1.real(), abs( zero1.imag() ));
 }
 
@@ -126,7 +126,7 @@ void calculateZeros(Polynomial &poly){
     else if(poly.b == 0){
         handleBZeroPolynomial(poly);
     }
-    else{
+    else {
         // .. it should be quadratic
         handleCompleteQuadraticPolynomial(poly);
     }
