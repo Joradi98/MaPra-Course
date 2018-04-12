@@ -48,9 +48,14 @@ bool Polynomial::isZeroPolynomial(){
 }
 
 void handleZeroPolynomial(Polynomial &poly){
-    if(poly.isZeroPolynomial()) cout << "Infinite many zeros." << endl;
-    else cout << "no zeros." << endl;
-    Ergebnis(0);
+    if(poly.isZeroPolynomial()){
+        cout << "Infinite many zeros." << endl;
+        Ergebnis(Unendlich);
+    }
+    else {
+        cout << "no zeros." << endl;
+        Ergebnis(0);
+    }
 }
 
 void handleLinearPolynomial(Polynomial &poly){
@@ -70,7 +75,6 @@ void handleBZeroPolynomial(Polynomial &poly){
 }
 
 void handleCompleteQuadraticPolynomial(Polynomial &poly){
-    // .. it should be quadratic
     double p = poly.b / poly.a;
     double q = poly.c / poly.a;
     double pHalf = p / 2;
@@ -123,6 +127,7 @@ void calculateZeros(Polynomial &poly){
         handleBZeroPolynomial(poly);
     }
     else{
+        // .. it should be quadratic
         handleCompleteQuadraticPolynomial(poly);
     }
 }
