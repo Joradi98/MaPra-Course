@@ -83,12 +83,12 @@ void handleCompleteQuadraticPolynomial(Polynomial &poly){
     // if p big number, factorise abs(p) to avoid overflow
     // check, whether (p/2)^2 will be bigger than DBL_MAX
     if( pHalf > sqrt(DBL_MAX) ){
-        complex<double> square( (pHalf * pHalf) - q, 0 );
-        pqRoot = sqrt(square);
-    }
-    else {
         complex<double> square( (1/4) - (q/p)/p , 0 );
         pqRoot = abs(p) * sqrt(square);
+    }
+    else {
+        complex<double> square( (pHalf * pHalf) - q, 0 );
+        pqRoot = sqrt(square);
     }
 			
     cout << "pq: " << pqRoot << endl;
