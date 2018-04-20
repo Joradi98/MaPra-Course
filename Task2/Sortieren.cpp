@@ -27,7 +27,7 @@ void bubbleSort(unsigned int *&array, size_t length) {
 
 
 /*
-Selection-Sort / Auswahlsortieren
+Selection-Sort
 */
 void selectionSort(unsigned int *&array, size_t length) {
 	int i, k, t, minIndex; 
@@ -46,8 +46,26 @@ void selectionSort(unsigned int *&array, size_t length) {
 }
 
 
+/*
+Insertion-Sort
+*/
+void insertionSort(unsigned int *&array, size_t length) {
+	int i, j;
+
+	// Iterate through the array
+	for (i = 1 ; i < length; i++) {
+		// Now take a look at the sub-array that consists of all elements up to the i-th element
+		j = i;
+	 
+		// "Insert" the i-th element at the right position in that sub-array
+		while ( j > 0 && array[j-1] > array[j]) {
+			tausche(array, j-1, j);
+			j--;
+		}
+	}
 
 
+}
 
 
 /*
@@ -95,16 +113,20 @@ int main(int argc, char *argv[]) {
 		unsigned int *array = new unsigned int[6];
 		size_t length = 6;
 
-
+		// Use mode 2 in order to receive a random array of specified length
 		start(2, length, array);
 		bubbleSort(array, length);
 		cout << "Bubble Sort: ";
 		printArray(array, length);
 		
-		// Use mode 2 in order to receive a random array of specified length
 		start(2, length, array);
 		selectionSort(array, length);
 		cout << "Selection Sort: ";
+		printArray(array, length);
+
+		start(2, length, array);
+		insertionSort(array, length);
+		cout << "Insertion Sort: ";
 		printArray(array, length);
 
 		
