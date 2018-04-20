@@ -12,7 +12,7 @@ Bubble-Sort (in place)
 void bubbleSort(unsigned int *&array, size_t length) {
 
 	// Iterate over all elements
-	int i, j, swap;
+	int i, j;
 	for (i = 0 ; i < ( length - 1 ); i++) {
 		
 		// Iterate from the end of the array down to i + 1
@@ -23,13 +23,35 @@ void bubbleSort(unsigned int *&array, size_t length) {
 			}
 		}
 	}
+}
+
+
+/*
+Selection-Sort / Auswahlsortieren
+*/
+void selectionSort(unsigned int *&array, size_t length) {
+	int i, k, t, minIndex; 
 	
+	// Iterate over all elements
+	for (i = 0 ; i < ( length - 1 ); i++) {
+		minIndex = i;
+		// Determine minimum of all following elements
+		for( k = i+1; k < length; k++) {
+			if( array[k] < array[minIndex]) minIndex = k;
+		}
+
+		// Then swap the current element with the minimum Elemenr
+		tausche(array, i, minIndex);
+	}
 }
 
 
 
+
+
+
 /*
-Helper method
+Helper method: Determine is a string displays an integer
 */
 bool isInteger(string s){
 	for (int i = 0; i < s.size(); i++){
@@ -40,7 +62,7 @@ bool isInteger(string s){
 
 
 /*
-Helper method
+Helper method: print an array of unsigned integers
 */
 void printArray(unsigned int* array, size_t length) {
 	int i;
@@ -70,16 +92,22 @@ int main(int argc, char *argv[]) {
 	}
 	else if(command == "all"){
 
-		unsigned int *array = new unsigned int[10];
-		array[0] = 3;
-		array[1] = 22;
-		array[2] = 3;
-		array[3] = 45;
-		array[4] = 100;
-		array[5] = 1;
+		unsigned int *array = new unsigned int[6];
+		size_t length = 6;
+
+
+		start(2, length, array);
+		bubbleSort(array, length);
+		cout << "Bubble Sort: ";
+		printArray(array, length);
 		
-		bubbleSort(array, 6);
-		printArray(array, 6);
+		// Use mode 2 in order to receive a random array of specified length
+		start(2, length, array);
+		selectionSort(array, length);
+		cout << "Selection Sort: ";
+		printArray(array, length);
+
+		
 		delete[] array;
 	}
 	else if(isInteger(command)){
