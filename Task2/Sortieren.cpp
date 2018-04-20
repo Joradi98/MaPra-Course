@@ -1,8 +1,88 @@
 #include <iostream>
-
 #include "unit.h"
 
 using namespace std;
+
+
+/*
+Help-function: determine median of the first, middle and last element of an rarray that start at left and ends at right
+*/
+int median3(unsigned int *&array, int left, int right)//Uses median of three partitioning technique
+{
+	int center = (left + right)/2;
+	if (array[center] < array[left]) 
+		tausche(array, left, center);
+	if (array[right] < array[left])
+		tausche(array, left, right);
+	if (array[right]< array[center])
+		tausche(array, center, right);
+
+	// Swap the median to be placed at the position right-1
+	tausche(array, center, right - 1); //since the largest is already in the right.
+
+	return array[right - 1];
+}
+/*
+Helper functino for quickSort: Returns index of pivot element
+	low	: Starting index,
+	high: Ending index 
+	
+	Uses the last element as pivot. 
+	Places all smaller elements in front of the pivot element.
+	Places all larger elements behind the pivot element.
+*/
+int partition (unsigned int *&array, int low, int high, bool useMedian = false)
+{
+	int pivot, i, j;
+	
+	if (useMedian == true) {
+		pivot = median3(array, low, high); 
+		// Be careful, if there are only 2 elements: Having called median3() they are already sorted.   
+ 		if (low == high - 1) 
+			return 0; // Return value doens't matter here, because 1 element is always sorted
+	
+	} else {
+		pivot = array[high];    
+	}
+	
+	
+	i = (low - 1);  // Index of smaller element
+
+	for (j = low; j <= high- 1; j++) {
+		// If current element is smaller than or
+		// equal to pivot
+		if (array[j] <= pivot) {
+			i++;    // increment index of smaller element
+			tausche(array, i, j);
+		}
+	}
+
+	tausche(array, i + 1, high);
+
+	return (i + 1);
+}
+
+
+/*
+Quick-Sort:
+	low	: Starting index,
+	high: Ending index 
+*/
+void quickSort(unsigned int *&array, int low, int high, bool useMedian = false)
+{
+	int pi;
+	if (low < high) {
+		/* pi is partitioning index, arr[p] is now at right place */
+		pi = partition(array, low, high);
+
+		// Separately sort elements before
+		// partition and after partition
+		quickSort(array, low, pi - 1);
+		quickSort(array, pi + 1, high);
+	}
+}
+
+
 
 
 /*
@@ -226,7 +306,7 @@ void printArray(unsigned int* array, size_t length) {
 int main(int argc, char *argv[]) {
 	cout << "What would you like to do?" << endl;
 	cout << "  manual: manually specify coefficients" << endl;
-	cout << "  1-" << 5 << ":   test n-th polynomial from unit.o" << endl;
+	cout << "  1-" << 42 << ":   test algorithms with a random array of specified length" << endl;
 	cout << "  all:    test all polynomials from unit.o" << endl;
 	string command;    
 	cin >> command;
@@ -242,8 +322,13 @@ int main(int argc, char *argv[]) {
 	}
 	else if(command == "all"){
 
+		
+	}
+	else if(isInteger(command)){
+		cout << "Specified an integer" << endl;
+
 		unsigned int *array = new unsigned int[6];
-		size_t length = 6;
+		size_t length = stoi(command);
 
 		// Use mode 2 in order to receive a random array of specified length
 		start(2, length, array);
@@ -272,12 +357,18 @@ int main(int argc, char *argv[]) {
 		cout << "Heap Sort: ";
 		printArray(array, length);
 
-		
-		
+
+		start(2, length, array);
+		quickSort(array, 0,length-1);
+		cout << "Quick Sort (last element): ";
+		printArray(array, length);
+
+		start(2, length, array);
+		quickSort(array, 0,length-1, true);
+		cout << "Quick Sort (median): ";
+		printArray(array, length);
+
 		delete[] array;
-	}
-	else if(isInteger(command)){
-		cout << "Specified an integer" << endl;
 	}
 	else {
 		cout << "unknown command. exiting.." << endl;
