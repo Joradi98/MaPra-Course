@@ -6,6 +6,89 @@ using namespace std;
 
 
 
+
+
+/*
+Helper function for Merge-Sort:
+	Merges two sorted sub-arrays into a combined sorted array
+*/
+// Merges two subarrays of arr[].
+// First subarray is arr[l..m]
+// Second subarray is arr[m+1..r]
+void merge(unsigned int *&array, int l, int m, int r)
+{
+	int i, j, k;
+	int n1 = m - l + 1;
+	int n2 =  r - m;
+ 
+	// Temporary Arrays for storing the left and right arrays (each of them is already sorted)
+	int L[n1], R[n2];
+ 
+	// Copy data 
+	for (i = 0; i < n1; i++)
+		L[i] = array[l + i];
+	for (j = 0; j < n2; j++)
+		R[j] = array[m + 1+ j];
+ 
+	// Start the merging process of L and R back into the real
+	i = 0; // Index for the left sub-array
+	j = 0; // Index for the right sub-array
+	k = l; // Merging starts at index l of the original array
+	while (i < n1 && j < n2) {
+		// Compare the first elements of L and R subarrays and copy the smaller one to the original array
+		if (L[i] <= R[j]) {
+			array[k] = L[i];
+			i++; // Advance the index of the left-subarray cause we have just taken an element from it
+		} else {
+			array[k] = R[j];
+			j++; // Advance the index of the right-subarray cause we have just taken an element from it
+		}
+		// Whichever sub-array we took an element from, advance the index of the original array
+		k++;
+	}
+ 
+	// Copy the remaining elements of L[], if there are any. 
+	while (i < n1) {
+		array[k] = L[i];
+		i++;
+		k++;
+	}
+ 
+	// Copy the remaining elements of R[], if there  are any. This may be the case, when the array is already completely sorted [1,2],[3,4]
+	while (j < n2) {
+		array[k] = R[j];
+		j++;
+		k++;
+	}
+	
+}
+
+
+
+
+
+/*
+Merge-Sort:
+	l is for left index and r is right index of the sub-array of arr to be sorted
+*/
+void mergeSort(unsigned int *&array, int l, int r) {
+	if (l < r) {
+		// Same as (l+r)/2, but avoids overflow for
+		// large l and h
+		int m = l+(r-l)/2;
+ 
+		// Sort first and second halves
+		mergeSort(array, l, m);
+		mergeSort(array, m+1, r);
+ 
+		// Now merge these subarrays in the right order
+		merge(array, l, m, r);
+	}
+}
+
+
+
+
 /*
 Bubble-Sort (in place)
 */
@@ -127,6 +210,11 @@ int main(int argc, char *argv[]) {
 		start(2, length, array);
 		insertionSort(array, length);
 		cout << "Insertion Sort: ";
+		printArray(array, length);
+		
+		start(2, length, array);
+		mergeSort(array, 0,length-1);
+		cout << "Merge Sort: ";
 		printArray(array, length);
 
 		
