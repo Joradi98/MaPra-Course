@@ -195,8 +195,6 @@ void merge(unsigned int *&array, int l, int m, int r)
 
 
 
-
-
 /*
 Merge-Sort:
 	l is for left index and r is right index of the sub-array of arr to be sorted
@@ -303,76 +301,91 @@ void printArray(unsigned int* array, size_t length) {
 	cout << array[length - 1] << endl;
 }
 
+void waitForUserToContinue() {
+	getchar();
+}
 
 int main(int argc, char *argv[]) {
-	cout << "What would you like to do?" << endl;
-	cout << "  manual: manually specify coefficients" << endl;
-	cout << "  1-" << 42 << ":   test algorithms with a random array of specified length" << endl;
-	cout << "  all:    test all polynomials from unit.o" << endl;
+	cout << "Please specify the length of the arrays you wish to sort..." << endl << "After that, each algorithm is tested with each testing mode." << endl;
+	cout << "Length: ";
 	string command;    
 	cin >> command;
-	double a, b, c, d, e;
-	if(command == "manual"){
-		cout << "specify values for the coefficients:" << endl;
-		cout << "a: "; cin >> a;
-		cout << "b: "; cin >> b;
-		cout << "c: "; cin >> c;
-		cout << "d: "; cin >> c;
-		cout << "e: "; cin >> c;
 
-	}
-	else if(command == "all"){
-
-		
-	}
-	else if(isInteger(command)){
+  	
+	if(isInteger(command)){
 		cout << "Specified an integer" << endl;
 
-		unsigned int *array = new unsigned int[6];
 		size_t length = stoi(command);
+		unsigned int *array = new unsigned int[length];
 
-		// Use mode 2 in order to receive a random array of specified length
-		start(2, length, array);
-		bubbleSort(array, length);
-		cout << "Bubble Sort: ";
-		printArray(array, length);
-		
-		start(2, length, array);
-		selectionSort(array, length);
-		cout << "Selection Sort: ";
-		printArray(array, length);
+		int i;
+		// Go through all the testing modes
+		for (i = 1; i < AnzahlBeispiele; i++) {
+			// Reset length, cause it gets overwritten by start()
+			length = stoi(command);
 
-		start(2, length, array);
-		insertionSort(array, length);
-		cout << "Insertion Sort: ";
-		printArray(array, length);
-		
-		start(2, length, array);
-		mergeSort(array, 0,length-1);
-		cout << "Merge Sort: ";
-		printArray(array, length);
-
-		
-		start(2, length, array);
-		heapSort(array, length);
-		cout << "Heap Sort: ";
-		printArray(array, length);
+			start(i, length, array);
+			bubbleSort(array, length);
+			cout << "Bubble Sort: ";
+			//printArray(array, length);
+			ergebnis(array);
+			cout << endl;
+			waitForUserToContinue();
+				
+			start(i, length, array);
+			selectionSort(array, length);
+			cout << "Selection Sort: ";
+			//printArray(array, length);
+			ergebnis(array);
+			cout << endl;
+			waitForUserToContinue();
 
 
-		start(2, length, array);
-		quickSort(array, 0,length-1);
-		cout << "Quick Sort (last element): ";
-		printArray(array, length);
+			start(i, length, array);
+			insertionSort(array, length);
+			cout << "Insertion Sort: ";
+			//printArray(array, length);
+			ergebnis(array);
+			cout << endl;
+			waitForUserToContinue();
 
-		start(2, length, array);
-		quickSort(array, 0,length-1, true);
-		cout << "Quick Sort (median): ";
-		printArray(array, length);
+			start(i, length, array);
+			mergeSort(array,0,length-1);
+			cout << "Merge Sort: ";
+			//printArray(array, length);
+			ergebnis(array);
+			cout << endl;
+			waitForUserToContinue();
 
-		delete[] array;
+			start(i, length, array);
+			heapSort(array, length);
+			cout << "Heap Sort: ";
+			//printArray(array, length);
+			ergebnis(array);
+			cout << endl;
+			waitForUserToContinue();
+
+			start(i, length, array);
+			quickSort(array, 0, length-1, false);
+			cout << "Quick Sort (classic): ";
+			//printArray(array, length);
+			ergebnis(array);
+			cout << endl;
+			waitForUserToContinue();
+
+			start(i, length, array);
+			quickSort(array, 0, length-1, true);
+			cout << "Quick Sort (median): ";
+			//printArray(array, length);
+			ergebnis(array);
+			cout << endl;
+			waitForUserToContinue();
+
+		}
+
 	}
 	else {
-		cout << "unknown command. exiting.." << endl;
+		cout << "You did not enter a valid number. exiting.." << endl;
 	}
 	return 0;
 
