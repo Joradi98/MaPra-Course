@@ -7,8 +7,9 @@ using namespace std;
 /*
 Help-function: determine median of the first, middle and last element of an rarray that start at left and ends at right
 */
-int median3(unsigned int *&array, int left, int right)//Uses median of three partitioning technique
+int median3(unsigned int *&array, int left, int right)
 {
+	// Determine the middle elements by sorting these three values manually
 	int center = (left + right)/2;
 	if (array[center] < array[left]) 
 		tausche(array, left, center);
@@ -18,16 +19,17 @@ int median3(unsigned int *&array, int left, int right)//Uses median of three par
 		tausche(array, center, right);
 
 	// Swap the median to be placed at the position right-1
-	tausche(array, center, right - 1); //since the largest is already in the right.
+	tausche(array, center, right - 1);
 
 	return array[right - 1];
 }
+
 /*
-Helper functino for quickSort: Returns index of pivot element
+Helper function for quickSort: Returns index of pivot element
 	low	: Starting index,
 	high: Ending index 
 	
-	Uses the last element as pivot. 
+	
 	Places all smaller elements in front of the pivot element.
 	Places all larger elements behind the pivot element.
 */
@@ -46,13 +48,14 @@ int partition (unsigned int *&array, int low, int high, bool useMedian = false)
 	}
 	
 	
-	i = (low - 1);  // Index of smaller element
+	// Index of smaller element
+	i = (low - 1); 
 
 	for (j = low; j <= high- 1; j++) {
-		// If current element is smaller than or
-		// equal to pivot
+		// If current element is smaller than or equal to pivot element
 		if (array[j] <= pivot) {
-			i++;    // increment index of smaller element
+			// increment index of smaller element
+			i++;    
 			tausche(array, i, j);
 		}
 	}
@@ -72,7 +75,7 @@ void quickSort(unsigned int *&array, int low, int high, bool useMedian = false)
 {
 	int pi;
 	if (low < high) {
-		/* pi is partitioning index, arr[p] is now at right place */
+		// pi is the partitioning index, array[pi] is automatically at the right place by calling this
 		pi = partition(array, low, high);
 
 		// Separately sort elements before
@@ -86,15 +89,14 @@ void quickSort(unsigned int *&array, int low, int high, bool useMedian = false)
 
 
 /*
-Healper function for Heap-Sort:
+Halper function for Heap-Sort:
+Heapifies a subtree rooted with node i which is an index in array[]
 */
-// To heapify a subtree rooted with node i which is
-// an index in arr[]. n is size of heap
 void heapify(unsigned int *&array, size_t length, int i)
 {
 	int largest = i;  // Initialize largest as root
-	int l = 2*i + 1;  // left = 2*i + 1
-	int r = 2*i + 2;  // right = 2*i + 2
+	int l = 2*i + 1;  // left = 2*i + 1  is the left child
+	int r = 2*i + 2;  // right = 2*i + 2 is the right child
  
 	// If left child is larger than root
 	if (l < length && array[l] > array[largest])
@@ -105,8 +107,7 @@ void heapify(unsigned int *&array, size_t length, int i)
 		largest = r;
  
 	// If largest is not root
-	if (largest != i)
-	{
+	if (largest != i) {
 		tausche(array, i, largest);
 
 		// Recursively heapify the affected sub-tree
@@ -140,13 +141,13 @@ void heapSort(unsigned int *&array, int n)
 /*
 Helper function for Merge-Sort:
 	Merges two sorted sub-arrays into a combined sorted array
+	First subarray is arr[l..m]
+	Second subarray is arr[m+1..r]
 */
-// Merges two subarrays of arr[].
-// First subarray is arr[l..m]
-// Second subarray is arr[m+1..r]
 void merge(unsigned int *&array, int l, int m, int r)
 {
 	int i, j, k;
+	
 	int n1 = m - l + 1;
 	int n2 =  r - m;
  
@@ -225,8 +226,8 @@ void bubbleSort(unsigned int *&array, size_t length) {
 
 	// Iterate over all elements
 	int i, j;
+	
 	for (i = 0 ; i < ( length - 1 ); i++) {
-		
 		// Iterate from the end of the array down to i + 1
 		for (j = length - 1 ; j > i; j--) {
 			if (array[j-1] > array[j])	{
@@ -252,7 +253,7 @@ void selectionSort(unsigned int *&array, size_t length) {
 			if( array[k] < array[minIndex]) minIndex = k;
 		}
 
-		// Then swap the current element with the minimum Elemenr
+		// Then swap the current element with the minimum Element
 		tausche(array, i, minIndex);
 	}
 }
@@ -281,7 +282,7 @@ void insertionSort(unsigned int *&array, size_t length) {
 
 
 /*
-Helper method: Determine is a string displays an integer
+Helper method: Determine if a string displays an integer
 */
 bool isInteger(string s){
 	for (int i = 0; i < s.size(); i++){
