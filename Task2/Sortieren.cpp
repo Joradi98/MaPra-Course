@@ -5,7 +5,8 @@ using namespace std;
 
 
 /*
-Help-function: determine median of the first, middle and last element of an rarray that start at left and ends at right
+Help-function: determine median of the first, middle and last element of an rarray that start at left and ends at right.
+ The median element is automatically placed at the very right of the array.
 */
 int median3(unsigned int *&array, int left, int right)
 {
@@ -18,10 +19,10 @@ int median3(unsigned int *&array, int left, int right)
 	if (array[right]< array[center])
 		tausche(array, center, right);
 
-	// Swap the median to be placed at the position right-1
-	tausche(array, center, right - 1);
+	// Swap the median to be placed at the very right.
+	tausche(array, center, right);
 
-	return array[right - 1];
+	return array[right];
 }
 
 /*
@@ -48,18 +49,20 @@ int partition (unsigned int *&array, int low, int high, bool useMedian = false)
 	}
 	
 	
-	// Index of smaller element
+	// Index of where the pivot is going to be located
 	i = (low - 1); 
-
-	for (j = low; j <= high- 1; j++) {
+    // Pivot is placed at the very right, so just go until high-1
+	for (j = low; j <= high-1; j++) {
 		// If current element is smaller than or equal to pivot element
 		if (array[j] <= pivot) {
-			// increment index of smaller element
-			i++;    
+			// increment index of pivot, because we just found a smaller element
+			i++;
+            // Swap j (which is <= pivot) with i (which is > pivot or which is i == j)
 			tausche(array, i, j);
 		}
 	}
 
+    //Swap with the pivot element, which is located at the very right
 	tausche(array, i + 1, high);
 
 	return (i + 1);
@@ -76,7 +79,7 @@ void quickSort(unsigned int *&array, int low, int high, bool useMedian = false)
 	int pi;
 	if (low < high) {
 		// pi is the partitioning index, array[pi] is automatically at the right place by calling this
-		pi = partition(array, low, high);
+		pi = partition(array, low, high, useMedian);
 
 		// Separately sort elements before
 		// partition and after partition
@@ -122,16 +125,19 @@ Heap-Sort
 */
 void heapSort(unsigned int *&array, int n)
 {
-	// Build heap
+	// Build heap. Only iterate over the first half - 1, because we must access the children properly in heapify()
+    // Heapify from bottom of the tree to the top
 	for (int i = n / 2 - 1; i >= 0; i--)
 		heapify(array, n, i);
  
 	// One by one extract an element from heap
 	for (int i=n-1; i>=0; i--) {
-		// Move current root to end
+		// Move current root to end.
+        // Swap 0 (largest element) to i (the end)
 		tausche(array, 0, i);
  
-		// call max heapify on the reduced heap
+		// call max heapify on the reduced heap.
+        // Don't touch the last element, cause that was alredy brought into the right position
 		heapify(array, i, 0);
 	}
 }
@@ -222,9 +228,9 @@ Bubble-Sort (in place)
 */
 void bubbleSort(unsigned int *&array, size_t length) {
 
-	// Iterate over all elements
 	int i, j;
-	
+
+    // Iterate over all elements
 	for (i = 0 ; i < ( length - 1 ); i++) {
 		// Iterate from the end of the array down to i + 1
 		for (j = length - 1 ; j > i; j--) {
@@ -270,6 +276,7 @@ void insertionSort(unsigned int *&array, size_t length) {
 	 
 		// "Insert" the i-th element at the right position in that sub-array
 		while ( j > 0 && array[j-1] > array[j]) {
+            // Swap bigger element to the right
 			tausche(array, j-1, j);
 			j--;
 		}
@@ -313,8 +320,6 @@ int main(int argc, char *argv[]) {
 
   	
 	if(isInteger(command)){
-		cout << "Specified an integer" << endl;
-
 		size_t length = stoi(command);
 		unsigned int *array = new unsigned int[length];
 
