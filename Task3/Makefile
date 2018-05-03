@@ -1,6 +1,6 @@
-CXXFLAGS = -O0 -g
+CXXFLAGS = -O0 -g -std=c++14
 
-sort: sort.o unit.o student.o
+tsort: sort.o unit.o student.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
 sort.o: sort.cpp student.h
@@ -10,6 +10,6 @@ student.o: student.cpp student.h
 	$(CXX) $(CXXFLAGS) -c $<
 
 clean:
-	rm -f student.o sort.o sort
+	rm -f student.o sort.o tsort
 
 .PHONY: clean

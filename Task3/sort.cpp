@@ -1,6 +1,7 @@
 #include <iostream>
 #include "unit.h"
 #include <stdio.h>
+#include <fstream>
 
 using namespace std;
 
@@ -13,21 +14,36 @@ void swap(std::vector<ElemT>& feld, int i, int j) {
 }
 
 
+template<typename ElemT>
+void einlesen(std::ifstream& ifs, std::vector<ElemT>& feld){
+    while(!ifs.eof()){
+        ElemT element; 
+        ifs >> element;
+        if(ifs.eof()) break;
+        feld.push_back(element);
+        //cout << "student: " << element << endl;
+    }
+    ifs.close();
+}
+
+
 /*
 Helper function for Merge-Sort:
 	Merges two sorted sub-arrays into a combined sorted array
 	First subarray is arr[l..m]
 	Second subarray is arr[m+1..r]
 */
-void merge(unsigned int *&array, int l, int m, int r)
+template<typename ElemT>
+void merge(vector<ElemT> array, int l, int m, int r)
 {
-	/*int i, j, k;
+	int i, j, k;
 	
 	int n1 = m - l + 1;
 	int n2 =  r - m;
  
 	// Temporary Arrays for storing the left and right arrays (each of them is already sorted)
-	int L[n1], R[n2];
+	vector<ElemT> L = {};
+    vector<ElemT> R = {};
  
 	// Copy data 
 	for (i = 0; i < n1; i++)
@@ -64,7 +80,7 @@ void merge(unsigned int *&array, int l, int m, int r)
 		array[k] = R[j];
 		j++;
 		k++;
-	}*/
+    }
 	
 }
 
@@ -74,18 +90,19 @@ void merge(unsigned int *&array, int l, int m, int r)
 Merge-Sort:
 	l is for left index and r is right index of the sub-array of arr to be sorted
 */
-void mergeSort(unsigned int *&array, int l, int r) {
+template<typename ElemT>
+void mergeSort(vector<ElemT> vector, int l, int r) {
 	if (l < r) {
 		// Same as (l+r)/2, but avoids overflow for
 		// large l and h
 		int m = l+(r-l)/2;
  
 		// Sort first and second halves
-		mergeSort(array, l, m);
-		mergeSort(array, m+1, r);
+		mergeSort(vector, l, m);
+		mergeSort(vector, m+1, r);
  
 		// Now merge these subarrays in the right order
-		merge(array, l, m, r);
+		merge(vector, l, m, r);
 	}
 }
 
@@ -97,13 +114,12 @@ Bubble-Sort (in place)
 */
 template<typename ElemT>
 void bubbleSort(std::vector<ElemT>& feld) {
-	typename std::vector<ElemT>::size_type minIndex, i, j;
 	size_t length = feld.size();
 
 	
-	for(i = 0; i != length; i++) {
+	for(int i = 0; i != length; i++) {
 		// Iterate from the end of the array down to i + 1
-		for(j = length - 1; j > i; j--) {
+		for(int j = length - 1; j > i; j--) {
 			if (feld[j] < feld[j-1]) {
 				swap(feld, j-1, j);
 			}
@@ -117,14 +133,11 @@ void bubbleSort(std::vector<ElemT>& feld) {
 Selection-Sort
 */
 template<typename ElemT>
-void selectionSort(std::vector<ElemT>& feld, size_t length) {
-	
-	typename std::vector<ElemT>::size_type minIndex, i, k;
-	// Iterate over all elements
-	for(i = 0; i != feld.size(); i++) {
-		minIndex = i;
+void selectionSort(std::vector<ElemT>& feld) {
+	for(int i = 0; i != feld.size(); i++) {
+		int minIndex = i;
 		// Determine minimum of all following elements
-		for(k = i+1; k != feld.size(); k++) {
+		for(int k = i+1; k != feld.size(); k++) {
 			if (feld[k] < feld[minIndex]) minIndex = k;
 		}
 		
@@ -149,26 +162,26 @@ bool isInteger(string s){
 
 
 /*
-Helper method: print an array of unsigned integers
+Helper method: print an vector of ElemT's
 */
 template<typename ElemT>
 void printVector(std::vector<ElemT>& feld) {
 	// Iterate and print values of vector
-	for(int element : feld) {
-		std::cout << element << ", ";
-	}
-	std::cout << endl;
+	for(typename std::vector<ElemT>::iterator it = feld.begin(); it != feld.end(); ++it){
+        std::cout << *it << endl;
+    }
 }
 
 void waitForUserToContinue() {
 	getchar();
 }
 
+
 int main(int argc, char *argv[]) {
     cout << "Welcome to Task 2b" << endl;
     cout << "Here you can not only sort unsigned int, but also many other types!" << endl;
-
-    
+    cout << "which sortg algorithm you want to test? (bubble, selection, merge)" << endl;
+    /*
     // Create a vector containing integers
 	std::vector<int> v = {7, 5, 16, 8};
  
@@ -177,7 +190,53 @@ int main(int argc, char *argv[]) {
 	v.push_back(13);
 	bubbleSort(v);
   
-	printVector(v);
+	//printVector(v);
+    */
+    
+    
+    std::ifstream ifs1 ("strings.txt", std::ifstream::in);
+    std::vector<std::string> v1 = {};
+    einlesen(ifs1, v1);
+    
+    std::ifstream ifs2 ("doubles.txt", std::ifstream::in);
+    std::vector<double> v2 = {};
+    einlesen(ifs2, v2);
+    
+
+    std::ifstream ifs3 ("studenten.txt", std::ifstream::in);
+    std::vector<Student> v3 = {};
+    einlesen(ifs3, v3);
+    
+    string sortType;
+    cin >> sortType;
+    
+    
+    if(sortType == "bubble"){
+        bubbleSort(v1);
+        bubbleSort(v2);
+        bubbleSort(v3);
+    }
+    else if(sortType == "selection"){
+        selectionSort(v1);
+        selectionSort(v2);
+        selectionSort(v3);
+    }
+    else if(sortType == "merge"){
+        mergeSort(v1, 0, v1.size() - 1);
+        mergeSort(v2, 0, v2.size() - 1);
+        mergeSort(v3, 0, v3.size() - 1);
+    }
+    else {
+        cout << "not a valid sorting algorithm. exiting.." << endl;
+    }
+
+    
+    if(!(ergebnis(v1) || ergebnis(v2) || ergebnis(v3))){
+        cout << "everything fine!" << endl;
+    }
+    else {
+        cout << "something wrong." << endl;
+    }
 
 	return 0;
 
