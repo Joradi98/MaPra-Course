@@ -7,7 +7,10 @@
 
 using namespace std;
 
-
+/*
+Helper function:
+	Swaps to elements in a vector.
+*/
 template<typename ElemT>
 void swap(std::vector<ElemT>& feld, int i, int j) {
 	ElemT at_j = feld[j];
@@ -16,6 +19,9 @@ void swap(std::vector<ElemT>& feld, int i, int j) {
 }
 
 
+/*
+Pushes elements from the specified input stream to the given vector. 
+*/
 template<typename ElemT>
 void einlesen(std::ifstream& ifs, std::vector<ElemT>& feld){
     while(!ifs.eof()){
@@ -28,6 +34,21 @@ void einlesen(std::ifstream& ifs, std::vector<ElemT>& feld){
     ifs.close();
 }
 
+/*
+Prints the vector
+*/
+template<typename ElemT>
+void ausgeben( std::ostream& os, const std::vector<ElemT>& feld) {
+	
+	size_t length = feld.size();
+	os << "Vektor: ";
+	for(int i = 0; i != length; i++) {
+		os << feld[i] << ", ";
+	}
+	os << endl;
+
+}
+
 
 /*
 Helper function for Merge-Sort:
@@ -36,7 +57,7 @@ Helper function for Merge-Sort:
 	Second subarray is arr[m+1..r]
 */
 template<typename ElemT>
-void merge(vector<ElemT> array, int l, int m, int r)
+void merge(vector<ElemT>& array, int l, int m, int r)
 {
 	int i, j, k;
 	
@@ -47,11 +68,13 @@ void merge(vector<ElemT> array, int l, int m, int r)
 	vector<ElemT> L = {};
     vector<ElemT> R = {};
  
+
 	// Copy data 
 	for (i = 0; i < n1; i++)
-		L[i] = array[l + i];
+		L.push_back(array[l + i]);
 	for (j = 0; j < n2; j++)
-		R[j] = array[m + 1+ j];
+		R.push_back(array[m + 1 + j]);
+
  
 	// Start the merging process of L and R back into the real
 	i = 0; // Index for the left sub-array
@@ -93,7 +116,7 @@ Merge-Sort:
 	l is for left index and r is right index of the sub-array of arr to be sorted
 */
 template<typename ElemT>
-void mergeSort(vector<ElemT> vector, int l, int r) {
+void mergeSort(vector<ElemT>& vector, int l, int r) {
 	if (l < r) {
 		// Same as (l+r)/2, but avoids overflow for
 		// large l and h
@@ -105,6 +128,7 @@ void mergeSort(vector<ElemT> vector, int l, int r) {
  
 		// Now merge these subarrays in the right order
 		merge(vector, l, m, r);
+
 	}
 }
 
@@ -112,7 +136,7 @@ void mergeSort(vector<ElemT> vector, int l, int r) {
 
 
 /*
-Bubble-Sort (in place)
+Bubble-Sort using templates
 */
 template<typename ElemT>
 void bubbleSort(std::vector<ElemT>& feld) {
@@ -132,7 +156,7 @@ void bubbleSort(std::vector<ElemT>& feld) {
 
 
 /*
-Selection-Sort
+Selection-Sort using templates
 */
 template<typename ElemT>
 void selectionSort(std::vector<ElemT>& feld) {
@@ -151,55 +175,18 @@ void selectionSort(std::vector<ElemT>& feld) {
 
 
 
-
-/*
-Helper method: Determine if a string displays an integer
-*/
-bool isInteger(string s){
-	for (int i = 0; i < s.size(); i++){
-		if(!isdigit(s[i])) return false;
-	}
-	return true;
-}
-
-
-/*
-Helper method: print an vector of ElemT's
-*/
-template<typename ElemT>
-void printVector(std::vector<ElemT>& feld) {
-	// Iterate and print values of vector
-	for(typename std::vector<ElemT>::iterator it = feld.begin(); it != feld.end(); ++it){
-        std::cout << *it << endl;
-    }
-}
-
-void waitForUserToContinue() {
-	getchar();
-}
-
-
 int main(int argc, char *argv[]) {
     cout << "Welcome to Task 2b" << endl;
     cout << "Here you can not only sort unsigned int, but also many other types!" << endl;
-    cout << "which sortg algorithm you want to test? (bubble, selection, merge)" << endl;
-    /*
-    // Create a vector containing integers
-	std::vector<int> v = {7, 5, 16, 8};
+    cout << "which sortg algorithm you want to test? (bubble (B), selection (S), merge (M)" << endl;
+   
  
-	// Add two more integers to vector
-	v.push_back(25);
-	v.push_back(13);
-	bubbleSort(v);
-  
-	//printVector(v);
-    */
-    
     
     std::ifstream ifs1 ("strings.txt", std::ifstream::in);
-    std::vector<std::string> v1 = {};
+    std::vector<std::string> v1;
     einlesen(ifs1, v1);
-    
+
+
     std::ifstream ifs2 ("doubles.txt", std::ifstream::in);
     std::vector<double> v2 = {};
     einlesen(ifs2, v2);
@@ -213,32 +200,36 @@ int main(int argc, char *argv[]) {
     cin >> sortType;
     
     
-    if(sortType == "bubble"){
+    if(sortType == "B"){
         bubbleSort(v1);
         bubbleSort(v2);
         bubbleSort(v3);
     }
-    else if(sortType == "selection"){
+    else if(sortType == "S"){
         selectionSort(v1);
         selectionSort(v2);
         selectionSort(v3);
     }
-    else if(sortType == "merge"){
-        mergeSort(v1, 0, v1.size() - 1);
-        mergeSort(v2, 0, v2.size() - 1);
-        mergeSort(v3, 0, v3.size() - 1);
+    else if(sortType == "M"){
+        mergeSort(v1, 0, v1.size()-1);
+        mergeSort(v2, 0, v2.size()-1);
+        mergeSort(v3, 0, v3.size()-1);
     }
     else {
         cout << "not a valid sorting algorithm. exiting.." << endl;
     }
 
     
-    if(!(ergebnis(v1) || ergebnis(v2) || ergebnis(v3))){
+  /*if(!(ergebnis(v1) || ergebnis(v2) || ergebnis(v3))){
         cout << "everything fine!" << endl;
     }
     else {
         cout << "something wrong." << endl;
-    }
+    }*/
+	
+	ausgeben(std::cout, v1);
+	ausgeben(std::cout, v2);
+	ausgeben(std::cout, v3);
 
 	return 0;
 
