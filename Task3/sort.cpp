@@ -46,7 +46,7 @@ Helper function for Merge-Sort:
 	Second subarray is arr[m+1..r]
 */
 template<typename ElemT>
-void merge(vector<ElemT> array, int l, int m, int r)
+void merge(vector<ElemT>& array, int l, int m, int r)
 {
 	int i, j, k;
 	
@@ -57,11 +57,13 @@ void merge(vector<ElemT> array, int l, int m, int r)
 	vector<ElemT> L = {};
     vector<ElemT> R = {};
  
+
 	// Copy data 
 	for (i = 0; i < n1; i++)
-		L[i] = array[l + i];
+		L.push_back(array[l + i]);
 	for (j = 0; j < n2; j++)
-		R[j] = array[m + 1+ j];
+		R.push_back(array[m + 1 + j]);
+
  
 	// Start the merging process of L and R back into the real
 	i = 0; // Index for the left sub-array
@@ -103,7 +105,7 @@ Merge-Sort:
 	l is for left index and r is right index of the sub-array of arr to be sorted
 */
 template<typename ElemT>
-void mergeSort(vector<ElemT> vector, int l, int r) {
+void mergeSort(vector<ElemT>& vector, int l, int r) {
 	if (l < r) {
 		// Same as (l+r)/2, but avoids overflow for
 		// large l and h
@@ -115,6 +117,7 @@ void mergeSort(vector<ElemT> vector, int l, int r) {
  
 		// Now merge these subarrays in the right order
 		merge(vector, l, m, r);
+
 	}
 }
 
@@ -234,9 +237,9 @@ int main(int argc, char *argv[]) {
         selectionSort(v3);
     }
     else if(sortType == "merge"){
-        mergeSort(v1, 0, v1.size() - 1);
-        mergeSort(v2, 0, v2.size() - 1);
-        mergeSort(v3, 0, v3.size() - 1);
+        mergeSort(v1, 0, v1.size()-1);
+        mergeSort(v2, 0, v2.size()-1);
+        mergeSort(v3, 0, v3.size()-1);
     }
     else {
         cout << "not a valid sorting algorithm. exiting.." << endl;
