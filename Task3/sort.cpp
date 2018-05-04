@@ -26,6 +26,18 @@ void einlesen(std::ifstream& ifs, std::vector<ElemT>& feld){
     ifs.close();
 }
 
+template<typename ElemT>
+void ausgeben( std::ostream& os, const std::vector<ElemT>& feld) {
+	
+	size_t length = feld.size();
+	os << "Feld: ";
+	for(int i = 0; i != length; i++) {
+		os << feld[i] << ", ";
+	}
+	os << endl;
+
+}
+
 
 /*
 Helper function for Merge-Sort:
@@ -231,12 +243,16 @@ int main(int argc, char *argv[]) {
     }
 
     
-    if(!(ergebnis(v1) || ergebnis(v2) || ergebnis(v3))){
+    /*if(!(ergebnis(v1) || ergebnis(v2) || ergebnis(v3))){
         cout << "everything fine!" << endl;
     }
     else {
         cout << "something wrong." << endl;
-    }
+    }*/
+	
+	ausgeben(std::cout, v1);
+	ausgeben(std::cout, v2);
+	ausgeben(std::cout, v3);
 
 	return 0;
 
