@@ -176,7 +176,7 @@ void selectionSort(std::vector<ElemT>& feld) {
 int main(int argc, char *argv[]) {
     cout << "Welcome to Task 2b" << endl;
     cout << "Here you can not only sort unsigned int, but also many other types!" << endl;
-    cout << "which sortg algorithm you want to test? (bubble, selection, merge)" << endl;
+    cout << "which sortg algorithm you want to test? (bubble (B), selection (S), merge (M)" << endl;
    
  
     
@@ -198,17 +198,17 @@ int main(int argc, char *argv[]) {
     cin >> sortType;
     
     
-    if(sortType == "bubble"){
+    if(sortType == "B"){
         bubbleSort(v1);
         bubbleSort(v2);
         bubbleSort(v3);
     }
-    else if(sortType == "selection"){
+    else if(sortType == "S"){
         selectionSort(v1);
         selectionSort(v2);
         selectionSort(v3);
     }
-    else if(sortType == "merge"){
+    else if(sortType == "M"){
         mergeSort(v1, 0, v1.size()-1);
         mergeSort(v2, 0, v2.size()-1);
         mergeSort(v3, 0, v3.size()-1);
