@@ -5,7 +5,10 @@
 
 using namespace std;
 
-
+/*
+Helper function:
+	Swaps to elements in a vector.
+*/
 template<typename ElemT>
 void swap(std::vector<ElemT>& feld, int i, int j) {
 	ElemT at_j = feld[j];
@@ -14,6 +17,9 @@ void swap(std::vector<ElemT>& feld, int i, int j) {
 }
 
 
+/*
+Pushes elements from the specified input stream to the given vector. 
+*/
 template<typename ElemT>
 void einlesen(std::ifstream& ifs, std::vector<ElemT>& feld){
     while(!ifs.eof()){
@@ -26,11 +32,14 @@ void einlesen(std::ifstream& ifs, std::vector<ElemT>& feld){
     ifs.close();
 }
 
+/*
+Prints the vector
+*/
 template<typename ElemT>
 void ausgeben( std::ostream& os, const std::vector<ElemT>& feld) {
 	
 	size_t length = feld.size();
-	os << "Feld: ";
+	os << "Vektor: ";
 	for(int i = 0; i != length; i++) {
 		os << feld[i] << ", ";
 	}
@@ -125,7 +134,7 @@ void mergeSort(vector<ElemT>& vector, int l, int r) {
 
 
 /*
-Bubble-Sort (in place)
+Bubble-Sort using templates
 */
 template<typename ElemT>
 void bubbleSort(std::vector<ElemT>& feld) {
@@ -145,7 +154,7 @@ void bubbleSort(std::vector<ElemT>& feld) {
 
 
 /*
-Selection-Sort
+Selection-Sort using templates
 */
 template<typename ElemT>
 void selectionSort(std::vector<ElemT>& feld) {
@@ -164,53 +173,15 @@ void selectionSort(std::vector<ElemT>& feld) {
 
 
 
-
-/*
-Helper method: Determine if a string displays an integer
-*/
-bool isInteger(string s){
-	for (int i = 0; i < s.size(); i++){
-		if(!isdigit(s[i])) return false;
-	}
-	return true;
-}
-
-
-/*
-Helper method: print an vector of ElemT's
-*/
-template<typename ElemT>
-void printVector(std::vector<ElemT>& feld) {
-	// Iterate and print values of vector
-	for(typename std::vector<ElemT>::iterator it = feld.begin(); it != feld.end(); ++it){
-        std::cout << *it << endl;
-    }
-}
-
-void waitForUserToContinue() {
-	getchar();
-}
-
-
 int main(int argc, char *argv[]) {
     cout << "Welcome to Task 2b" << endl;
     cout << "Here you can not only sort unsigned int, but also many other types!" << endl;
     cout << "which sortg algorithm you want to test? (bubble, selection, merge)" << endl;
-    /*
-    // Create a vector containing integers
-	std::vector<int> v = {7, 5, 16, 8};
+   
  
-	// Add two more integers to vector
-	v.push_back(25);
-	v.push_back(13);
-	bubbleSort(v);
-  
-	//printVector(v);
-    */
-    
     
     std::ifstream ifs1 ("strings.txt", std::ifstream::in);
-    std::vector<std::string> v1 = {};
+    std::vector<std::string> v1;
     einlesen(ifs1, v1);
 
 
@@ -247,12 +218,12 @@ int main(int argc, char *argv[]) {
     }
 
     
-    if(!(ergebnis(v1) || ergebnis(v2) || ergebnis(v3))){
+  /*if(!(ergebnis(v1) || ergebnis(v2) || ergebnis(v3))){
         cout << "everything fine!" << endl;
     }
     else {
         cout << "something wrong." << endl;
-    }
+    }*/
 	
 	ausgeben(std::cout, v1);
 	ausgeben(std::cout, v2);
