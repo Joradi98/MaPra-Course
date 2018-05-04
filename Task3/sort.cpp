@@ -212,7 +212,8 @@ int main(int argc, char *argv[]) {
     std::ifstream ifs1 ("strings.txt", std::ifstream::in);
     std::vector<std::string> v1 = {};
     einlesen(ifs1, v1);
-    
+
+
     std::ifstream ifs2 ("doubles.txt", std::ifstream::in);
     std::vector<double> v2 = {};
     einlesen(ifs2, v2);
@@ -246,12 +247,12 @@ int main(int argc, char *argv[]) {
     }
 
     
-    /*if(!(ergebnis(v1) || ergebnis(v2) || ergebnis(v3))){
+    if(!(ergebnis(v1) || ergebnis(v2) || ergebnis(v3))){
         cout << "everything fine!" << endl;
     }
     else {
         cout << "something wrong." << endl;
-    }*/
+    }
 	
 	ausgeben(std::cout, v1);
 	ausgeben(std::cout, v2);
