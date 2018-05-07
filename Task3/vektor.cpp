@@ -87,7 +87,16 @@ Vektor& Vektor::operator = (const Vektor& x)
 
 Vektor& Vektor::operator += (const Vektor& x)
 {
-  // ***** Hier fehlt was *****
+  #ifndef NDEBUG
+    if (Vek.size() != x.Laenge())
+      VekFehler("Inkompatible Dimensionen fuer 'Vektor += Vektor'!");
+  #endif
+
+  for (size_t i = 0; i < Vek.size(); i++)
+    (*this)(i) += x(i);
+
+
+  return *this;
 }
 
 
@@ -95,7 +104,17 @@ Vektor& Vektor::operator += (const Vektor& x)
 
 Vektor& Vektor::operator -= (const Vektor& x)
 {
-  // ***** Hier fehlt was *****
+#ifndef NDEBUG
+  if (Vek.size() != x.Laenge())
+    VekFehler("Inkompatible Dimensionen fuer 'Vektor -= Vektor'!");
+#endif
+
+for (size_t i = 0; i < Vek.size(); i++)
+  (*this)(i) -= x(i);
+
+
+return *this;
+
 }
 
 
@@ -103,7 +122,11 @@ Vektor& Vektor::operator -= (const Vektor& x)
 
 Vektor& Vektor::operator *= (const double c)
 {
-  // ***** Hier fehlt was *****
+  for (size_t i = 0; i < Vek.size(); i++)
+    (*this)(i) *= c;
+
+
+  return *this;
 }
 
 
@@ -111,7 +134,16 @@ Vektor& Vektor::operator *= (const double c)
 
 Vektor& Vektor::operator /= (const double c)
 {
-  // ***** Hier fehlt was *****
+  #ifndef NDEBUG
+    if (c == 0.0)
+      VekFehler("Ein Vektor kann nicht durch Null geteilt werden");
+  #endif
+
+  for (size_t i = 0; i < Vek.size(); i++)
+    (*this)(i) /= c;
+
+
+  return *this;
 }
 
 
@@ -145,7 +177,13 @@ Vektor& Vektor::ReDim (size_t l)
 
 double Vektor::Norm2() const
 {
-  // ***** Hier fehlt was *****
+  #ifndef NDEBUG
+    if (Vek.size() <= 0)
+      Vektor::VekFehler("Ein Vektor unter Laenge 1 hat keine sinnvolle euklidische Norm");
+  #endif
+
+  double scalarProdukt = dot(*this,*this);
+  return sqrt(scalarProdukt);
 }
 
 
@@ -153,7 +191,16 @@ double Vektor::Norm2() const
 
 double Vektor::NormMax() const
 {
-  // ***** Hier fehlt was *****
+  #ifndef NDEBUG
+    if (Vek.size() <= 0)
+      Vektor::VekFehler("Ein Vektor unter Laenge 1 hat keine sinnvolle max. Norm");
+  #endif
+
+  double max = abs((*this)(0));
+  for (size_t i = 1; i < Vek.size(); i++) {
+    if (abs((*this)(i)) > max) max = abs((*this)(i));
+  }
+  return max;
 }
 
 
@@ -180,7 +227,14 @@ Vektor operator + (const Vektor& x, const Vektor& y)
 
 Vektor operator - (const Vektor& x, const Vektor& y)
 {
-  // ***** Hier fehlt was *****
+#ifndef NDEBUG
+  if (x.Laenge() != y.Laenge())
+    Vektor::VekFehler("Inkompatible Dimensionen fuer 'Vektor - Vektor'!");
+#endif
+
+  Vektor z = x;
+  return z -= y;
+
 }
 
 
@@ -188,7 +242,10 @@ Vektor operator - (const Vektor& x, const Vektor& y)
 
 Vektor operator - (const Vektor& x)
 {
-  // ***** Hier fehlt was *****
+
+  Vektor z = 0*x - x; //Nullvektor initialisieren
+  return z;
+
 }
 
 
@@ -196,7 +253,19 @@ Vektor operator - (const Vektor& x)
 
 double dot (const Vektor& x, const Vektor& y)
 {
-  // ***** Hier fehlt was *****
+  #ifndef NDEBUG
+    if (x.Laenge() != y.Laenge())
+      Vektor::VekFehler("Inkompatible Dimensionen fuer das Skalarprodukt 'Vektor dot Vektor'!");
+  #endif
+  
+  // Skalarprodukt = (x(1) * y(1) + x(2) * y(2) + ... + x(n) * y(n))
+  double scalarProduct = 0.0;
+  for (size_t i = 0; i < x.Laenge(); i++)
+    scalarProduct += x(i)*y(i);
+  
+  return scalarProduct;
+  
+  
 }
 
 
@@ -204,7 +273,8 @@ double dot (const Vektor& x, const Vektor& y)
 
 Vektor operator * (const double c, const Vektor& x)
 {
-  // ***** Hier fehlt was *****
+  Vektor z = x;
+  return z *= c;
 }
 
 
@@ -212,7 +282,8 @@ Vektor operator * (const double c, const Vektor& x)
 
 Vektor operator * (const Vektor& x, const double c)
 {
-  // ***** Hier fehlt was *****
+  Vektor z = x;
+  return z *= c;
 }
 
 
@@ -220,7 +291,13 @@ Vektor operator * (const Vektor& x, const double c)
 
 Vektor operator / (const Vektor& x, const double c)
 {
-  // ***** Hier fehlt was *****
+  #ifndef NDEBUG
+    if (c == 0.0)
+      Vektor::VekFehler("Ein Vektor kann nicht durch Null geteilt werden");
+  #endif
+
+  Vektor z = x;
+  return z /= c;
 }
 
 
@@ -246,7 +323,15 @@ bool operator == (const Vektor& x, const Vektor& y)
 
 bool operator != (const Vektor& x, const Vektor& y)
 {
-  // ***** Hier fehlt was *****
+  if (x.Laenge() != y.Laenge())
+    return false;
+    
+  for (size_t i = 0; i < x.Laenge(); i++) {
+    if (x(i) != y(i)) return false;
+  }
+  
+  return true;
+
 }
 
 
