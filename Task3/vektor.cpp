@@ -70,8 +70,10 @@ double Vektor::operator () (size_t i) const {
 Vektor& Vektor::operator = (const Vektor& x)
 {
 #ifndef NDEBUG
-  if (Vek.size() != x.Laenge())
+  if (Vek.size() != x.Laenge()) {
+    std::cout << std::endl << "Error: " << Vek.size() << " und " << x.Laenge() << std::endl;
     VekFehler("Inkompatible Dimensionen fuer 'Vektor = Vektor'!");
+  }
 #endif
 
   for (size_t i = 0; i < Vek.size(); i++)

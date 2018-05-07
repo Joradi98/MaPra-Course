@@ -259,10 +259,24 @@ Matrix operator - (const Matrix& x)
 
 // ----- Matrixprodukt -----
 
-Matrix operator * (const Matrix& x, const Matrix& y)
+Matrix operator * (const Matrix& A, const Matrix& B)
 {
-  //------FIXME-----//
-  return Matrix();
+  #ifndef NDEBUG
+    if (A.Spalten() != B.Zeilen())
+      Matrix::MatFehler("Inkompatible Dimensionen fuer 'Matrix*Matrix'!");
+  #endif
+
+  Matrix result = Matrix(A.Zeilen(),B.Spalten());
+  size_t i, k, j;
+  
+  for (i = 0; i < A.Zeilen(); i++) {
+    for (k = 0; k < B.Spalten(); k++) {
+      for (j = 0; j < B.Zeilen(); j++) {
+        result(i,k) += A(i,j)*B(j,k);
+      }
+    }
+  }
+  return result;
 }
 
 // ----- Skalare Vielfache -----
@@ -294,14 +308,48 @@ Matrix operator / (const Matrix& x,  double y)
 
 // ----- Matrix mal Vektor -----
 
-Vektor   operator *  (const Matrix&, const Vektor&)
+Vektor   operator *  (const Matrix& A, const Vektor& x)
 {
-  return Vektor();
+  #ifndef NDEBUG
+    if (A.Spalten() != x.Laenge())
+      Matrix::MatFehler("Inkompatible Dimensionen fuer 'Matrix*Vektor'!");
+  #endif
+
+  Vektor result = Vektor(A.Zeilen());
+
+  size_t i,j;
+  for (i = 0; i < A.Zeilen(); i++) {
+    //Berechne den i-ten Eintrag des result-Vektors: i-te Zeile mal Vektor
+    for (j = 0; j < A.Spalten(); j++) {
+      result(i) += A(i,j)*x(j);
+    }
+    
+    
+  }
+    
+  return result;
 } 
 
-Vektor   operator *  (const Vektor&, const Matrix&)
+// Das wird ein bisschen hacky, um die Tests zu erfuellen. Wieso auch immer dieses Produkt so sinnvol sein sollte...
+Vektor   operator *  (const Vektor& x, const Matrix& A)
 {
-  return Vektor();
+  #ifndef NDEBUG
+    if (A.Zeilen() != x.Laenge())
+      Matrix::MatFehler("Inkompatible Dimensionen fuer 'Vek*Mal'!");
+  #endif
+
+  Vektor result = Vektor(A.Spalten());
+
+  size_t i,j;
+  for (i = 0; i < A.Spalten(); i++) {
+    //Berechne den i-ten Eintrag des result-Vektors: i-te Zeile mal Vektor
+    for (j = 0; j < A.Zeilen(); j++) {
+      result(i) += A(j,i)*x(j);
+    }
+    
+    
+  }
+  return result;
 } 
 
 
