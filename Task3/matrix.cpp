@@ -183,7 +183,7 @@ Matrix& Matrix::operator /= (const double c)
 //      Dimensionen
 // =====================
 
-Matrix& Matrix::ReDim (size_t m, size_t n)
+void Matrix::ReDim (size_t m, size_t n)
 {
   #ifndef NDEBUG
     if (m <= 0 || n <= 0)
@@ -276,6 +276,7 @@ Matrix operator * (const Matrix& A, const Matrix& B)
       }
     }
   }
+  
   return result;
 }
 

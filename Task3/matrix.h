@@ -24,7 +24,7 @@ class Matrix
     double& operator () (size_t, size_t);         // Zugriff auf Einträge der Matrix
     double  operator () (size_t, size_t) const;   // Zugriff auf falls Matrix const
 
-    Matrix& ReDim   (size_t, size_t);                   // neue Dimensionen festlegen
+    void ReDim   (size_t, size_t);                   // neue Dimensionen festlegen
     size_t  Zeilen  () const { return Zeil; }  // Zeilen
     size_t  Spalten  () const { return Spalt; }  // Spalten
 
