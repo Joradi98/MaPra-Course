@@ -33,6 +33,7 @@ class Matrix
     Matrix& operator += (const Matrix&);  // Zuweisungen mit arithm. Operation
     Matrix& operator -= (const Matrix&);
     Matrix& operator *= (const double); // Multiplikation mit einem Faktor
+    Matrix& operator /= (const double); // Division mit einem Faktor
 
     friend Matrix operator +  (const Matrix&, const Matrix&); // Addition
     friend Matrix operator -  (const Matrix&, const Matrix&); // Subtraktion
