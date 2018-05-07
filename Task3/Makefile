@@ -1,15 +1,14 @@
-CXXFLAGS = -O0 -g -std=c++14
+CXXFLAGS = -O2 -Wall
 
-tsort: sort.o unit.o student.o
+test: vektor.o matrix.o test.o
 	$(CXX) $(CXXFLAGS) -o $@ $^
 
-sort.o: sort.cpp student.h
+vektor.o: vektor.cpp vektor.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-student.o: student.cpp student.h
+matrix.o: matrix.cpp matrix.h vektor.h
 	$(CXX) $(CXXFLAGS) -c $<
-
-clean:
-	rm -f student.o sort.o tsort
 
 .PHONY: clean
+clean:
+	rm -f test vektor.o matrix.o
