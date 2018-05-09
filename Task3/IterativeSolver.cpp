@@ -8,6 +8,7 @@
 #include "unit.h"
 #include <cmath>
 #include <cstdlib>
+#include <iostream>
 
 
 Vektor jacobi(Matrix A, Vektor x0, Vektor b, double tol, unsigned int maxIter, unsigned int &benoetigteIterationen)
@@ -148,25 +149,40 @@ Vektor conjugate_gradients(Matrix A, Vektor x0, Vektor b, double tol, unsigned i
   
 }
 
-
+/*
+Helper method: Determine if a string displays an integer
+*/
+bool isInteger(std::string s){
+  using namespace std;
+  for (unsigned int i = 0; i < s.size(); i++){
+    if(!isdigit(s[i])) return false;
+  }
+  return true;
+}
 
 
 int main(int argc, char* argv[]) 
 {
   std::cout << "Willkommen zur Aufgabe 3. Hier werden iterative Loesungsverfahren für lineare Gleichungssysteme implementiert." << std::endl;
+  std::cout << "Welches Beispiel moechtest du testen? ";
 
-  int i, maxIter = 0;
-  unsigned int anzahlIter;
-  Matrix A;
-  Vektor x0;
-  Vektor b;
-
-  double tol = 0;
   
-  for (i=1; i <= AnzahlBeispiele; i++) {  
+  std::string command;    
+  std::cin >> command;
+
+  if(isInteger(command)){
+    
+    int i = stoi(command); //Stoi avaiable in c++11
+    int maxIter = 0;
+    unsigned int anzahlIter;
+    Matrix A;
+    Vektor x0;
+    Vektor b;
+    double tol = 0;
+
+
     Start(i, A, x0, b, tol, maxIter);
     Vektor result(x0.Laenge());
-
     result = jacobi(A, x0, b, tol, maxIter, anzahlIter);
     Ergebnis(result, anzahlIter, 0); // Jacobi entspricht 0
     
@@ -177,15 +193,16 @@ int main(int argc, char* argv[])
     Start(i, A, x0, b, tol, maxIter);
     result = conjugate_gradients(A, x0, b, tol, maxIter, anzahlIter);
     Ergebnis(result, anzahlIter, 2); // CG entspricht 2
-
+     
     
-    
-    //TODO: Nummer des Beispiels als Kommandozeilenparameter uebergeben
-    //TODO: LGS loesen
-    //TODO: Relatives Residuum in Datei schreiben, gnuplot?
-    //TODO: Ergebnis aufrufen
-    // Vielleicht TODO: Matrix ueberpruefen, sodass keine Nullen auf Diagonale stehen
+  } else {
+    std::cout << "Das ist keine gueltige Zahl. Programmabbruch." << std::endl;
   }
+  
+  
+  //TODO: Relatives Residuum in Datei schreiben, gnuplot?
+  // Vielleicht TODO: Matrix ueberpruefen, sodass keine Nullen auf Diagonale stehen
+  
   
 
 }

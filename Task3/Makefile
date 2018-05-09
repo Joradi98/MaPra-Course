@@ -1,6 +1,6 @@
 all: test solver
 
-CXXFLAGS = -O2 -Wall
+CXXFLAGS = -O2 -Wall -std=c++11
 
 test: vektor.o matrix.o test.o
 	$(CXX) $(CXXFLAGS) -o $@ vektor.o matrix.o test.o
