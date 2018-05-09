@@ -355,6 +355,32 @@ Vektor   operator *  (const Vektor& x, const Matrix& A)
 
 
 // ==========================
+//      Ein- und Ausgabe
+// ==========================
+
+
+// ----- Ausgabe "<<" -----
+
+std::ostream& operator << (std::ostream& s, const Matrix& x)
+{
+  s << std::setiosflags(std::ios::right);
+  s << "# Dimension: " << x.Zeilen() << " Zeilen und " << x.Spalten() << " Spalten" << std::endl;
+  for (size_t i = 0, xsize = x.Zeilen(); i < xsize; i++) {
+    for (size_t j = 0, ySize = x.Spalten(); j < ySize; j++) {
+      s << x(i,j) << " ";
+    }
+    s << std::endl;
+
+  }
+
+  return s;
+}
+
+
+
+
+
+// ==========================
 //      Fehlerbehandlung
 // ==========================
 
