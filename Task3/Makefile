@@ -1,3 +1,5 @@
+all: test solver
+
 CXXFLAGS = -O2 -Wall
 
 test: vektor.o matrix.o test.o
@@ -12,6 +14,10 @@ vektor.o: vektor.cpp vektor.h
 matrix.o: matrix.cpp matrix.h vektor.h
 	$(CXX) $(CXXFLAGS) -c $<
 
+solver: IterativeSolver.cpp vektor.cpp matrix.cpp unit.o
+	$(CXX) $(CXXFLAGS) -o $@ IterativeSolver.cpp vektor.cpp matrix.cpp unit.o
+
+
 .PHONY: clean
 clean:
-	rm -f test vektor.o matrix.o test.o
+	rm -f test vektor.o matrix.o test.o solver
