@@ -9,6 +9,31 @@
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
+
+
+/*
+Helper function: Appends to file
+*/
+void clearFile(std::string fileName) {
+  //std::ifstream ifs1 ("strings.txt", std::ifstream::in);
+  std::ofstream myfile;
+  myfile.open (fileName, std::ofstream::out | std::ofstream::trunc);
+  myfile.close();
+
+}
+
+
+/*
+Helper function: Appends to file
+*/
+void append(std::string fileName, Vektor x) {
+  //std::ifstream ifs1 ("strings.txt", std::ifstream::in);
+  std::ofstream myfile;
+  myfile.open (fileName, std::ofstream::out | std::ofstream::app);
+  myfile << x << std::endl;
+  myfile.close();
+}
 
 
 Vektor jacobi(Matrix A, Vektor x0, Vektor b, double tol, unsigned int maxIter, unsigned int &benoetigteIterationen)
@@ -17,13 +42,21 @@ Vektor jacobi(Matrix A, Vektor x0, Vektor b, double tol, unsigned int maxIter, u
   double sum;
   Vektor oldVektor = x0;
   Vektor newVector = x0;
-  
-
+  Vektor residuum(maxIter); //Residuum als Vektor realisieren.
+  std::string logFile = "jacobi.txt";
   
   // Algorithmus durchfuehren bis gewuenschte Genuaigkeit oder max. Anzahl der Iterationen 
   for (i = 0; i < maxIter; i++) {
     //Iterationsschritt i
     
+    //Abbruchbedingung ueberpruefen.
+    residuum(i) = (b - A*newVector).Norm2()/b.Norm2();
+    if ( residuum(i) < tol ) {
+      break;
+    }
+    
+    append(logFile, oldVektor);
+
     for (k = 0; k < x0.Laenge(); k++) {
       //Komponente k des neuen Vektors berechnen
       
@@ -38,17 +71,15 @@ Vektor jacobi(Matrix A, Vektor x0, Vektor b, double tol, unsigned int maxIter, u
       newVector(k) = 1.0/A(k,k) * ( b(k) - sum );
     }
     
-    //Abbruchbedingung ueberpruefen.
-    if ( fabs( (b - A*newVector).Norm2()/b.Norm2()) < tol ) {
-      i++;
-      break;
-    }
+    
     
     //Alten Vektor auf den neuen setzen, um nachste Iteration vorzubereiten
     oldVektor = newVector;
   }
   
   // Rueckgabe
+  clearFile(logFile);
+  append(logFile, residuum);
   benoetigteIterationen = i;
   return newVector;
 }
@@ -60,12 +91,20 @@ Vektor gauss_seidel(Matrix A, Vektor x0, Vektor b, double tol, unsigned int maxI
   double sum1, sum2;
   Vektor oldVektor = x0;
   Vektor newVector = x0;
-  
+  Vektor residuum(maxIter); //Residuum als Vektor realisieren.
+  std::string logFile = "gauss_seidel.txt";
+
 
   
   // Algorithmus durchfuehren bis gewuenschte Genuaigkeit oder max. Anzahl der Iterationen 
   for (i = 0; i < maxIter; i++) {
     //Iterationsschritt i
+    
+    //Abbruchbedingung ueberpruefen.
+    residuum(i) = (b - A*newVector).Norm2()/b.Norm2();
+    if ( residuum(i) < tol ) {
+      break;
+    }
     
     for (k = 0; k < x0.Laenge(); k++) {
       //Komponente k des neuen Vektors berechnen
@@ -86,17 +125,15 @@ Vektor gauss_seidel(Matrix A, Vektor x0, Vektor b, double tol, unsigned int maxI
       newVector(k) = 1.0/A(k,k) * ( b(k) - sum1 - sum2 );
     }
     
-    //Abbruchbedingung ueberpruefen.
-    if ( fabs( (b - A*newVector).Norm2()/b.Norm2()) < tol ) {
-      i++;
-      break;
-    }
+  
     
     //Alten Vektor auf den neuen setzen, um nachste Iteration vorzubereiten
     oldVektor = newVector;
   }
   
   // Rueckgabe
+  clearFile(logFile);
+  append(logFile, residuum);
   benoetigteIterationen = i;
   return newVector;
 }
@@ -107,14 +144,14 @@ Vektor conjugate_gradients(Matrix A, Vektor x0, Vektor b, double tol, unsigned i
 {
   unsigned int i;
   double alpha, gamma_old, gammma_new;
-  
   Vektor x_old = x0;
   Vektor x_new = x0;
-  
   Vektor q(x0.Laenge()), p_old(x0.Laenge()), p_new(x0.Laenge()), r_old(x0.Laenge()), r_new(x0.Laenge());
+  Vektor residuum(maxIter); //Residuum als Vektor realisieren.
+  std::string logFile = "conjugate_gradients.txt";
+
   
   //Initialisierung
-  
   p_old = b - A*x0;
   r_old = p_old;
   
@@ -125,7 +162,8 @@ Vektor conjugate_gradients(Matrix A, Vektor x0, Vektor b, double tol, unsigned i
     //Iterationsschritt i
 
     //Abbruchbedingung ueberpruefen.
-    if ( fabs(r_old.Norm2()/b.Norm2()) < tol ) {
+    residuum(i) = (r_old).Norm2()/b.Norm2();
+    if ( residuum(i) < tol ) {
       break;
     }
 
@@ -144,6 +182,8 @@ Vektor conjugate_gradients(Matrix A, Vektor x0, Vektor b, double tol, unsigned i
   }
   
   // Rueckgabe
+  clearFile(logFile);
+  append(logFile, residuum);
   benoetigteIterationen = i;
   return x_new;
   
