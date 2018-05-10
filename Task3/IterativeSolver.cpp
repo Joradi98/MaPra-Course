@@ -10,7 +10,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-
+#include <sstream>
 
 /*
 Helper function: Appends to file
@@ -204,46 +204,40 @@ bool isInteger(std::string s){
 int main(int argc, char* argv[]) 
 {
   std::cout << "Willkommen zur Aufgabe 3. Hier werden iterative Loesungsverfahren für lineare Gleichungssysteme implementiert." << std::endl;
-  std::cout << "Welches Beispiel moechtest du testen? ";
-
-  
-  std::string command;    
-  std::cin >> command;
-
-  if(isInteger(command)){
-    
-    int i = stoi(command); //Stoi avaiable in c++11
-    int maxIter = 0;
-    unsigned int anzahlIter;
-    Matrix A;
-    Vektor x0;
-    Vektor b;
-    double tol = 0;
-
-
-    Start(i, A, x0, b, tol, maxIter);
-    Vektor result(x0.Laenge());
-    result = jacobi(A, x0, b, tol, maxIter, anzahlIter);
-    Ergebnis(result, anzahlIter, 0); // Jacobi entspricht 0
-    
-    Start(i, A, x0, b, tol, maxIter);
-    result = gauss_seidel(A, x0, b, tol, maxIter, anzahlIter);
-    Ergebnis(result, anzahlIter, 1); // GaussSeidel entspricht 1 
-
-    Start(i, A, x0, b, tol, maxIter);
-    result = conjugate_gradients(A, x0, b, tol, maxIter, anzahlIter);
-    Ergebnis(result, anzahlIter, 2); // CG entspricht 2
-     
-    
-  } else {
-    std::cout << "Das ist keine gueltige Zahl. Programmabbruch." << std::endl;
+  //std::cout << "Welches Beispiel moechtest du testen? ";
+  if(argc < 2){
+    std::cout << "Zu wenige Parameter. abbrechen..." << std::endl;
   }
-  
-  
-  //TODO: Relatives Residuum in Datei schreiben, gnuplot?
-  // Vielleicht TODO: Matrix ueberpruefen, sodass keine Nullen auf Diagonale stehen
-  
-  
+  else {
+      std::stringstream IStr(argv[1]);
+      int x;
+      IStr >> x;
+      std::cout << x << std::endl;  
+      if(x < 1 || x > 3){
+          std::cout << "parameter not in range of (1, 3) or not a string. exiting.." << std::endl;
+      }
+      else {
+            int maxIter = 0;
+            unsigned int anzahlIter;
+            Matrix A;
+            Vektor x0;
+            Vektor b;
+            double tol = 0;
 
+            Start(x, A, x0, b, tol, maxIter);
+            Vektor result(x0.Laenge());
+            result = jacobi(A, x0, b, tol, maxIter, anzahlIter);
+            Ergebnis(result, anzahlIter, 0); // Jacobi entspricht 0
+            
+            Start(x, A, x0, b, tol, maxIter);
+            result = gauss_seidel(A, x0, b, tol, maxIter, anzahlIter);
+            Ergebnis(result, anzahlIter, 1); // GaussSeidel entspricht 1 
+
+            Start(x, A, x0, b, tol, maxIter);
+            result = conjugate_gradients(A, x0, b, tol, maxIter, anzahlIter);
+            Ergebnis(result, anzahlIter, 2); // CG entspricht 2 
+      }
+      //TODO: Relatives Residuum in Datei schreiben, gnuplot?
+      // Vielleicht TODO: Matrix ueberpruefen, sodass keine Nullen auf Diagonale stehen
+  }
 }
-
