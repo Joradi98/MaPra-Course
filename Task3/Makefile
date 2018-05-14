@@ -1,15 +1,23 @@
-CXXFLAGS = -O0 -g -std=c++14
+all: test solver
 
-tsort: sort.o unit.o student.o
-	$(CXX) $(CXXFLAGS) -o $@ $^
+CXXFLAGS = -O2 -Wall -std=c++11
 
-sort.o: sort.cpp student.h
+test: vektor.o matrix.o test.o
+	$(CXX) $(CXXFLAGS) -o $@ vektor.o matrix.o test.o
+
+test.o: test.cpp vektor.h matrix.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-student.o: student.cpp student.h
+vektor.o: vektor.cpp vektor.h
 	$(CXX) $(CXXFLAGS) -c $<
 
-clean:
-	rm -f student.o sort.o tsort
+matrix.o: matrix.cpp matrix.h vektor.h
+	$(CXX) $(CXXFLAGS) -c $<
+
+solver: IterativeSolver.cpp vektor.cpp matrix.cpp unit.o
+	$(CXX) $(CXXFLAGS) -o $@ IterativeSolver.cpp vektor.cpp matrix.cpp unit.o
+
 
 .PHONY: clean
+clean:
+	rm -f test vektor.o matrix.o test.o solver
