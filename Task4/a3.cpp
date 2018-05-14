@@ -15,6 +15,16 @@
 
 lint PrimTest(lint n, const CSieb& Sieb){ 
     lint lowestFactor = 1;
+    if(n > Sieb.length()){
+    	lint border = static_cast<lint>(sqrt(n));
+	for(lint i = 2; i <= border + 1; i++){
+	    //std::cout << "::: " << n << ", " << border << ", " <<  i << " mod: " << (n % i)  << std::endl; 
+	    if(n % i == 0){
+		return i;
+	    }
+	}    
+	return 1;
+    }
     if(!Sieb[n]){
         lowestFactor++;
         for(; n % lowestFactor != 0; lowestFactor++){
@@ -26,44 +36,30 @@ lint PrimTest(lint n, const CSieb& Sieb){
 
 // Miller-Rabin
 
-lint MillerRabinTest(lint n, lint a, lint d, lint r)
-{ return 0; }
 
 // Hilfsfunktionen
 
-lint fastpow(lint nBase, lint nExp, lint nMod){ 
-    lint current = nExp;
-    lint result = 1;
-    lint lastSquare = 0;
-    lint lastSquareI = 0;
-    lint mulValue = 0;
-    for(int i = 0;; i++){
-        std::cout << "current: " << current << std::endl;
-        if(current == 0) return result;
-        lint currentBit = current & 1;
-        if(currentBit == 1){
-            lint expValue = (2 << (i - 1));
-            std::cout << "current & 1: " << (current & 1) << std::endl;
-            std::cout << ".. times: " << expValue << std::endl;
-            //use previous value, if there is
-            if(i % 2 == 1 && lastSquareI == i - 1){
-                mulValue = mulValue * mulValue;
-            }
-            else {
-                mulValue = pow(nBase, expValue);
-            }
-            lastSquare = mulValue;
-            lastSquareI = i;
-            std::cout << "|-> mulValue before mod " << nMod << ": " << mulValue << std::endl;
-            mulValue = mulValue % nMod;
-            std::cout << "|-> mulValue after mod " << nMod << ": " << mulValue << std::endl; 
-            result *= mulValue;
-            result = result % nMod;
-            std::cout << "result: " << result << std::endl;
-        }
-        current = current >> 1;
-    }
-    return 0; 
+lint fastpow(lint nBase, lint nExp, lint nMod){
+	//std::cout << nBase << ", " << nExp << ", " << nMod << std::endl;
+	lint result = 1;
+	while(nExp != 0){
+		lint currentBit = nExp & 1;
+		if(currentBit == 1){
+			result = (result * nBase) % nMod;
+		}
+		//std::cout << "exponent: " << nExp << ", " << result << ", " << nBase << std::endl;
+		nExp = nExp >> 1;
+		nBase = (nBase * nBase) % nMod;
+	}
+	//std::cout << result << "WTFFFFFF" << std::endl;
+	return result;
+}
+
+
+
+
+lint MillerRabinTest(lint n, lint a, lint d, lint r){ 
+	return fastpow(a, ((lint) pow(2,r)) * d, n);
 }
 
 lint gcd(lint a, lint b){ 
@@ -78,13 +74,25 @@ lint gcd(lint a, lint b){
     return a;
 }
 
-void get_ds(lint n, lint& d, lint& s)
-{ return; }
+void get_ds(lint n, lint& d, lint& s){
+	s = 1;
+	for(lint r = 1;; r++){
+		//std::cout << "n: " << n << ", r: " << r << ", ---: " << (n-1) % ((lint) pow(2, r)) << std::endl;
+		if(pow(2, r) > n){
+			break;
+		}
+		if((n - 1) % (lint) pow(2, r) == 0){
+			s = r;
+		}
+	} 
+	d = (n-1)/pow(2, s);
+	return; 
+}
 
 // Fermat
 
-lint FermatTest(lint n, lint a){ 
-    return fastpow(a, n-1, n);
+lint FermatTest(lint n, lint a){
+	 return fastpow(a, n-1, n);
 }
 
 
@@ -108,7 +116,7 @@ int main()
         for(lint j = 2;;j++){
             if(i * j >= Sieb.length()) break;
             Sieb[i * j] = false;
-        }
+        	}
     }
     std::cout << "sieve ready." << std::endl;
 	// ... Ihre Berechnung des Siebs
@@ -120,25 +128,79 @@ int main()
     std::cout << "testing \"Probe\".. " << AnzahlBeispiele << " for testing found. " << std::endl;
     for(unsigned int i = 1; i <= AnzahlBeispiele; i++){
         lint testValue = HoleKandidaten(Probe, i);
-        std::cout << "-- testing value: " << testValue << std::endl;
-        if(testValue < Sieb.length()){
-            TestErgebnis(Probe, i, PrimTest(testValue, Sieb)); 
-        }
+        //std::cout << "-- testing value: " << testValue << std::endl;
+        TestErgebnis(Probe, i, PrimTest(testValue, Sieb)); 
     }   
     
     std::cout << "fastpow(4, 24, 123): " << fastpow(4, 24, 123) << std::endl;
-	std::cout << "gcd(12345, 5245): " << gcd(12345, 5245) << std::endl;
+    //std::cout << "gcd(12345, 5245): " << gcd(12345, 5245) << std::endl;
     // Fermat-Test
     
+    std::cout << "testint Fermtat...." << std::endl;
     for(unsigned int i = 1; i <= AnzahlBeispiele; i++){
         lint testValue = HoleKandidaten(Fermat, i);
-        std::cout << "-- testing value: " << testValue << std::endl;
-        lint result = FermatTest(1, testValue);
-        std::cout << "fermat result" << result << std::endl;
+        //std::cout << "-- testing value: " << testValue << std::endl;
+        bool saveNoPrime = false;
+	for(lint j = 2; j < MaxTestPrimzahl; j++){
+	    if(Sieb[j] && testValue % j != 0){
+	    	lint result = FermatTest(testValue, j);
+            	//std::cout << "fermat result" << result << std::endl;
+                //std::cout << "inner: bsp = " << i << " ( = " << testValue << ") , testing: " << j << " with result: " << result << std::endl; 
+		TestErgebnis(Fermat, i, result, j);
+		if(result != 1){
+		     saveNoPrime = true;
+		     break;
+		}
+	    }
+	}
+	//std::cout << "inner end.. final result:" << std::endl;
+	TestErgebnis(Fermat, i, saveNoPrime ? 0 : 1, 0);
+	//std::cout << "proceeding to next example..." << std::endl;	
     }
-
+	//std::cout << "test calculation....." << std::endl;
+	//std::cout << "fastpow(2, 560, 561): " << fastpow(2, 560, 561) << std::endl;
 	// Miller-Rabin-Test
+	
+	
 
+	std::cout << "testing miller rabin....... max: " << MaxTestPrimzahl << std::endl;
+	for(unsigned int i = 1; i < AnzahlBeispiele; i++){
+		lint testValue = HoleKandidaten(MillerRabin, i);
+		bool maybePrime = true;
+		bool proof = false;
+		//std::cout << "testing: " << testValue << std::endl;
+		for(lint j = 1; j <= MaxTestPrimzahl; j++){
+			if(Sieb[j] && gcd(j, testValue) == 1){
+				//std::cout << "working with value " << j << "....." << std::endl;
+				lint d = 0;
+				lint s = 0;
+				get_ds(testValue, d, s);
+				//std::cout << "s: " << s << " , d: " << d << std::endl;
+				if(fastpow(j, d, testValue) == 1){
+					proof = true;
+				} 
+				else {
+					for(lint r = 0; r <= s - 1; r++){
+						lint result = MillerRabinTest(testValue, j, d, r); 
+						//std::cout << "--- r: " << r << ", result: " << result << std::endl;	
+						//TestErgebnis(MillerRabin, i, result, j, r);
+						if(result == testValue - 1){
+							proof = true;
+						}
+					}
+				} 
+				//std::cout << "proof after j = " << j << ": " << proof << std::endl;
+				maybePrime = maybePrime & proof;
+				proof = false;
+				
+			}
+			
+		}
+		//std::cout << maybePrime << std::endl;
+		TestErgebnis(MillerRabin, i, maybePrime ? 1 : 0, 0); 
+	}
+
+	//std::cout << fastpow(3, 1500955143, 3001910287) << std::endl;
 	return 0;
 }
 
