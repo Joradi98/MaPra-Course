@@ -23,10 +23,6 @@ lint PrimTest(lint n, const CSieb& Sieb){
     return lowestFactor;
 }
 
-// Fermat
-
-lint FermatTest(lint n, lint a)
-{ return 0; }
 
 // Miller-Rabin
 
@@ -35,14 +31,62 @@ lint MillerRabinTest(lint n, lint a, lint d, lint r)
 
 // Hilfsfunktionen
 
-lint fastpow(lint nBase, lint nExp, lint nMod)
-{ return 0; }
+lint fastpow(lint nBase, lint nExp, lint nMod){ 
+    lint current = nExp;
+    lint result = 1;
+    lint lastSquare = 0;
+    lint lastSquareI = 0;
+    lint mulValue = 0;
+    for(int i = 0;; i++){
+        std::cout << "current: " << current << std::endl;
+        if(current == 0) return result;
+        lint currentBit = current & 1;
+        if(currentBit == 1){
+            lint expValue = (2 << (i - 1));
+            std::cout << "current & 1: " << (current & 1) << std::endl;
+            std::cout << ".. times: " << expValue << std::endl;
+            //use previous value, if there is
+            if(i % 2 == 1 && lastSquareI == i - 1){
+                mulValue = mulValue * mulValue;
+            }
+            else {
+                mulValue = pow(nBase, expValue);
+            }
+            lastSquare = mulValue;
+            lastSquareI = i;
+            std::cout << "|-> mulValue before mod " << nMod << ": " << mulValue << std::endl;
+            mulValue = mulValue % nMod;
+            std::cout << "|-> mulValue after mod " << nMod << ": " << mulValue << std::endl; 
+            result *= mulValue;
+            result = result % nMod;
+            std::cout << "result: " << result << std::endl;
+        }
+        current = current >> 1;
+    }
+    return 0; 
+}
 
-lint gcd(lint a, lint b)
-{ return 0; }
+lint gcd(lint a, lint b){ 
+    lint x;
+    if(a == 0) return b;
+    if(b == 0) return a;
+    while(b != 0){
+        x = a % b;
+        a = b;
+        b = x;
+    }
+    return a;
+}
 
 void get_ds(lint n, lint& d, lint& s)
 { return; }
+
+// Fermat
+
+lint FermatTest(lint n, lint a){ 
+    return fastpow(a, n-1, n);
+}
+
 
 //------------------------------------------------------------------------------
 // Hauptprogramm
@@ -51,6 +95,7 @@ void get_ds(lint n, lint& d, lint& s)
 int main()
 {
 	CSieb Sieb;
+    std::cout << "creating Sieb of size " << Sieb.length() << "." << std::endl;
     for(lint i = 0; i < Sieb.length(); i++){
         Sieb[i] = true;
     }
@@ -71,9 +116,26 @@ int main()
 	SiebTest(Sieb);
 
 	// PrimTest
-    std::cout << PrimTest(9, Sieb) << std::endl;    
-
-	// Fermat-Test
+    
+    std::cout << "testing \"Probe\".. " << AnzahlBeispiele << " for testing found. " << std::endl;
+    for(unsigned int i = 1; i <= AnzahlBeispiele; i++){
+        lint testValue = HoleKandidaten(Probe, i);
+        std::cout << "-- testing value: " << testValue << std::endl;
+        if(testValue < Sieb.length()){
+            TestErgebnis(Probe, i, PrimTest(testValue, Sieb)); 
+        }
+    }   
+    
+    std::cout << "fastpow(4, 24, 123): " << fastpow(4, 24, 123) << std::endl;
+	std::cout << "gcd(12345, 5245): " << gcd(12345, 5245) << std::endl;
+    // Fermat-Test
+    
+    for(unsigned int i = 1; i <= AnzahlBeispiele; i++){
+        lint testValue = HoleKandidaten(Fermat, i);
+        std::cout << "-- testing value: " << testValue << std::endl;
+        lint result = FermatTest(1, testValue);
+        std::cout << "fermat result" << result << std::endl;
+    }
 
 	// Miller-Rabin-Test
 
