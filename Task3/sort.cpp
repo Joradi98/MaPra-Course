@@ -6,7 +6,7 @@
 #include "unit.h"
 
 using namespace std;
-
+	
 /*
 Helper function:
 	Swaps to elements in a vector.
