@@ -1,5 +1,3 @@
-// ...
-
 #include <cmath>
 #include <iostream>
 #include <random>
@@ -7,14 +5,21 @@
 
 void NetzwerkMain();
 
-// ...
 
-// const unsigned int Schwierigkeitsgrad = 0;
+ const unsigned int Schwierigkeitsgrad = 0;
 
 enum Feld
 { leer, gelb, rot };
 
-// ...
+
+
+/*
+int errechneterZug(Spielbrett aktuellesSpielfeld) {
+    //Krasse Berechnungen
+    return Spalte
+}
+
+*/
 
 int main()
 {
@@ -23,14 +28,14 @@ int main()
     // Netzwerkspiel? Rufe NetzwerkMain() auf.
 
 // ...
-
-//    Start(Schwierigkeitsgrad);
-
+    Start(Schwierigkeitsgrad);
+    
+    
     for(unsigned int Spiel = 1; Spiel <= AnzahlSpiele; Spiel++)
     {
 
 // ...
-
+        NaechsterZug(1);
     }
 
     return 0;
