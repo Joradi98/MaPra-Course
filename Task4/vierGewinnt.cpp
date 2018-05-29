@@ -2,15 +2,12 @@
 #include <iostream>
 #include <random>
 #include "unit.h"
+#include "Spielbrett.h"
 
 void NetzwerkMain();
 
 
  const unsigned int Schwierigkeitsgrad = 0;
-
-enum Feld
-{ leer, gelb, rot };
-
 
 
 /*
@@ -27,15 +24,18 @@ int main()
 
     // Netzwerkspiel? Rufe NetzwerkMain() auf.
 
-// ...
     Start(Schwierigkeitsgrad);
     
     
     for(unsigned int Spiel = 1; Spiel <= AnzahlSpiele; Spiel++)
     {
+        /*while(spiel ist noch nicht vorbei) {
+            std::cout << Spiel << std::endl;
 
-// ...
-        NaechsterZug(1);
+            //Kalkuliere naechsten Zug 
+        }*/
+       
+        
     }
 
     return 0;
