@@ -14,17 +14,20 @@ class Spielbrett
 {
 	private:
 		size_t Zeil, Spalt; 								// Dimensionen des Spielbretts
-		std::vector< std::vector<Feld> > matrix; 
+		std::vector< std::vector<Feld> > matrix;
 	public:
 		explicit Spielbrett (size_t m=1, size_t n=1);
-		
-		bool spielIstBeendet();
-		
-		Feld& operator () (size_t, size_t);       			// Zugriff auf Einträge der Matrix
-		
-		bool setzeStein(int , Feld);					// Gibt zuruekc, ob die Aktion erfolgreich war
-		void entferneStein(int);					// Entfernt obersten Stein aus einer Spalte
 
+		bool spielIstBeendet();
+
+		Feld& operator () (size_t, size_t);       			// Zugriff auf Einträge der Matrix
+
+		int getColorId(Feld);
+		Feld getColor(int);
+
+		bool setzeStein(int , Feld);					// Gibt zuruekc, ob die Aktion erfolgreich war
+		bool addTile(int, int);
+		void entferneStein(int);					// Entfernt obersten Stein aus einer Spalte
 
 		double heuristischeBewertung(Feld); 					//Bewertet die aktuelle Verteilung der Steine fuer eine gegebene Farbe
 

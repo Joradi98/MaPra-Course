@@ -3,41 +3,42 @@
 #include <random>
 #include "unit.h"
 #include "Spielbrett.h"
+#include <algorithm>
 
 void NetzwerkMain();
 
 
- const unsigned int Schwierigkeitsgrad = 0;
+const unsigned int Schwierigkeitsgrad = 1;
 
 
 
 double miniMax(Spielbrett brett, Feld farbe, std::vector<int>& besteZuege , int tiefe = 4) {
     Feld gegenfarbe  = farbe == rot ? gelb : rot;
 
-    
+
     //Wechlse noch mit min und max je nachdem ob u an der reihe bist
     if (tiefe == 0 || brett.spielIstBeendet()) {
 
         return brett.heuristischeBewertung(farbe);
     }
-    
-    
+
+
     if ( farbe == gelb ) {
         double maxWert = -INFINITY;
         // Generiere moegliche Zuege:
         for (unsigned int i = 0; i < AnzahlSpalten; i++) {
             if (brett.setzeStein(i, farbe) == true ) { //Sofern das ein gueltieger Zug ist
                 double wert = miniMax(brett, gegenfarbe, besteZuege, tiefe-1);
-               
+
                 brett.entferneStein(i);
                 if (wert >= maxWert) {
                     maxWert = wert;
-                   
+
                     if (tiefe == 4) {
                         //Einer der besten Zuege
                         besteZuege.push_back(i);
                     }
-                    
+
                 }
             }
         }
@@ -50,16 +51,16 @@ double miniMax(Spielbrett brett, Feld farbe, std::vector<int>& besteZuege , int 
         for (unsigned int i = 0; i < AnzahlSpalten; i++) {
             if (brett.setzeStein(i, farbe) == true ) { //Sofern das ein gueltieger Zug ist
                 double wert = miniMax(brett, gegenfarbe, besteZuege, tiefe-1);
-               
+
                 brett.entferneStein(i);
                 if (wert <= minWert) {
                     minWert = wert;
-                   
+
                     if (tiefe == 4) {
                         //Einer der besten Zuege
                         besteZuege.push_back(i);
                     }
-                    
+
                 }
             }
         }
@@ -67,22 +68,57 @@ double miniMax(Spielbrett brett, Feld farbe, std::vector<int>& besteZuege , int 
         return minWert;
 
     }
-    
-    
+
+
 }
 
+
+int rows = 7;
+// max color is the color of the player MAX, the player we want to win
+double miniMax2(Spielbrett gameField, Feld maxColor, int currentColor, std::vector<int>& bestMoves, int layer, int searchDepth){
+    if(layer == maxLayer){
+        return gameField.heuristischeBewertung(maxColor);
+    }
+
+    std::vector<int> miniMaxValues;
+    for(int i = 0; i < rows; i++){
+        if(gameField.addTile(i, currentColor)){
+            miniMaxValues.push_back(miniMax2(gameField, 1 - currentColor, bestMoves, layer + 1, searchDepth));
+            gameField.entferneStein(i);
+        }
+    }
+
+    int miniMaxValue;
+    if(layer % 2 == 0){
+        //MAX layer
+        miniMaxValue = std::max_element(miniMaxValues.begin(), miniMaxValues.end());
+    } else {
+        //MIN layer
+        miniMaxValue = std::min_element(miniMaxValues.begin(), miniMaxValues.end());
+    }
+
+    if(layer == 0){
+        for(int i = 0; i < miniMaxValues.size(); i++){
+            if(miniMaxValues[i] == miniMaxValue){
+                bestMoves.push_back(i);
+            }
+        }
+    }
+
+    return miniMaxValue;
+}
 
 int errechneBestenZug(Spielbrett brett, Feld farbe) {
 
     std::vector<int> besteZuege;
-    miniMax(brett, farbe, besteZuege);
- 
+    miniMax2(brett, farbe, getColorId(farbe), besteZuege, 0, 1);
+
     std::cout << "Zuege: ";
     for (auto i = besteZuege.begin(); i != besteZuege.end(); ++i)
         std::cout << *i << ' ';
     std::cout << std::endl;
-    
-    
+
+
     return besteZuege[0];
 }
 
@@ -96,40 +132,40 @@ int main()
     // Netzwerkspiel? Rufe NetzwerkMain() auf.
 
     Start(Schwierigkeitsgrad);
-    
-    
+
+
     for(unsigned int Spiel = 1; Spiel <= AnzahlSpiele; Spiel++)
     {
         Spielbrett brett = Spielbrett(6,7);
-        
-        
+
+
         if (Spiel % 2 == 1) { //Wir fangen an mit gelb
             meineFarbe = gelb;
             gegnerFarbe = rot;
 
-            nextMove = errechneBestenZug(brett, meineFarbe); 
+            nextMove = errechneBestenZug(brett, meineFarbe);
             brett.setzeStein(nextMove, meineFarbe);
         } else { //Das Programm der Umgebung unit.o beginnt mit gelb
             meineFarbe = rot;
             gegnerFarbe = gelb;
             nextMove = -1;
         }
-        
+
         Gegenzug = NaechsterZug(nextMove);
-        
+
         while (Gegenzug >= 0) { //Falls Spiel vorbei, wird kleiner Null zurueckgegeben
-            
+
             brett.setzeStein(Gegenzug, gegnerFarbe);
-            
+
             //nextMove = besterZug in aktuellem Spielfeld
-            nextMove = errechneBestenZug(brett, meineFarbe); 
+            nextMove = errechneBestenZug(brett, meineFarbe);
             brett.setzeStein(nextMove, meineFarbe);
 
             Gegenzug = NaechsterZug(nextMove);
 
         }
-       
-        
+
+
     }
 
     return 0;
@@ -148,15 +184,15 @@ enum class SpielStatus {
 SpielStatus Netzwerkspiel( Feld MeineFarbe ) {
 
     // TODO Implementiere Netzwerkprotokoll
-    
+
     return SpielStatus::Verbindungsfehler;
 }
 
 void NetzwerkMain() {
     int command;
-    
+
     // Einleseschleife für Befehle. Terminiert, wenn ein gültiger Befehl gewählt wurde.
-    while (true) {    
+    while (true) {
         std::cout << "\n";
         std::cout << "1 = VERBINDE  mit einem anderen Spieler\n";
         std::cout << "2 = WARTE     auf einen anderen Spieler" << std::endl;
@@ -169,49 +205,49 @@ void NetzwerkMain() {
             break;
         }
     }
-    
+
     if (command == 0) {
         return;
     }
-    
+
     Feld MeineFarbe=  gelb,
          GegnerFarbe= rot;
-         
+
     if (command == 1) {
-        std::string ip;        
+        std::string ip;
         unsigned short port = 0;
-        
+
         std::cout << "Bitte geben Sie die IP ein, mit der Sie sich verbinden wollen. \n";
         std::cout << "Format: xxx.xxx.xxx.xxx" << std::endl;
         std::cin >> ip;
         std::cout << "Bitte geben Sie den Port ein, mit dem Sie sich verbinden wollen. \n";
         std::cin >> port;
-        
+
         if (!Verbinde(ip.c_str(), port)) {
             std::cout << "Verbindung fehlgeschlagen." << std::endl;
             return;
         }
 
         std::cout << "Verbindung hergestellt." << std::endl;
-        
+
         // Ich verbinde mich -> Meine Farbe ist rot
         std::swap(MeineFarbe, GegnerFarbe);
     } else {
         unsigned short port = 0;
-        
+
         std::cout << "Bitte geben Sie den Port ein, mit dem sich Ihr Mitspieler verbinden soll. \n";
         std::cin >> port;
         std::cout << "Warte auf Gegner..." << std::endl;
-        
+
         if (!WarteAufVerbindung(port)) {
             std::cout << "Kein Gegner gefunden.";
             return;
         }
         std::cout << "Verbindung hergestellt." << std::endl;
-        
+
         // Ich warte auf Spieler -> meine Farbe ist gelb
     }
-    
+
     bool nochEinSpiel = true;
     while (nochEinSpiel) {
         auto ergebnis = Netzwerkspiel( MeineFarbe );
@@ -221,7 +257,7 @@ void NetzwerkMain() {
             std::cout << "Verbindungsfehler!" << std::endl;
         } else {
             switch(ergebnis) {
-                case SpielStatus::Niederlage: 
+                case SpielStatus::Niederlage:
                     std::cout << "Sie haben verloren!" << std::endl;
                     break;
                 case SpielStatus::Unentschieden:
@@ -249,6 +285,6 @@ void NetzwerkMain() {
             }
         }
     }
-    
+
     SchliesseVerbindung();
 }
