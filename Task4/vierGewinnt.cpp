@@ -11,14 +11,56 @@ void NetzwerkMain();
 
 
 
-int errechneBestenZug(Spielbrett brett, Feld farbe, int tiefe = 4) {
+double miniMax(Spielbrett brett, Feld farbe, std::vector<int>& besteZuege , int tiefe = 4) {
+    Feld gegenfarbe  = farbe == rot ? gelb : rot;
 
+    
+    //Wechlse noch mit min und max je nachdem ob u an der reihe bist
     if (tiefe == 0 || brett.spielIstBeendet()) {
+        std::cout << brett.heuristischeBewertung(farbe) << std::endl;
+
         return brett.heuristischeBewertung(farbe);
     }
-//    std::cout << brett.heuristischeBewertung(farbe) << std::endl;
-    return 0;
+    
+    double maxWert = -INFINITY;
+    // Generiere moegliche Zuege:
+    for (unsigned int i = 0; i < AnzahlSpalten; i++) {
+        if (brett.setzeStein(i, farbe) == true ) { //Sofern das ein gueltieger Zug ist
+            double wert = miniMax(brett, gegenfarbe, besteZuege, tiefe-1);
+           
+
+            brett.entferneStein(i);
+            if (wert >= maxWert) {
+                maxWert = wert;
+                
+                
+                if (tiefe == 4) {
+                    //Einer der besten Zuege
+                    besteZuege.push_back(i);
+                }
+                
+            }
+        }
+    }
+
+    return maxWert;
 }
+
+
+int errechneBestenZug(Spielbrett brett, Feld farbe) {
+
+    std::vector<int> besteZuege;
+    miniMax(brett, farbe, besteZuege);
+ 
+    std::cout << "Zuege: ";
+    for (auto i = besteZuege.begin(); i != besteZuege.end(); ++i)
+        std::cout << *i << ' ';
+    std::cout << std::endl;
+    
+    
+    return besteZuege[0];
+}
+
 
 
 
@@ -58,7 +100,6 @@ int main()
             nextMove = errechneBestenZug(brett, meineFarbe); 
             brett.setzeStein(nextMove, meineFarbe);
 
-            brett.heuristischeBewertung(meineFarbe);
             Gegenzug = NaechsterZug(nextMove);
 
         }

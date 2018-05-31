@@ -22,7 +22,10 @@ class Spielbrett
 		
 		Feld& operator () (size_t, size_t);       			// Zugriff auf Einträge der Matrix
 		
-		void setzeStein(int , Feld);
+		bool setzeStein(int , Feld);					// Gibt zuruekc, ob die Aktion erfolgreich war
+		void entferneStein(int);					// Entfernt obersten Stein aus einer Spalte
+
+
 		double heuristischeBewertung(Feld); 					//Bewertet die aktuelle Verteilung der Steine fuer eine gegebene Farbe
 
 		static void BrettFehler (const std::string& str);   // Fehlermeldung ausgeben

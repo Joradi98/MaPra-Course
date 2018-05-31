@@ -47,23 +47,38 @@ Feld& Spielbrett::operator () (size_t i, size_t j) {
 
 
 
-void Spielbrett::setzeStein(int Spalte, Feld farbe) {
-#ifndef NDEBUG
+bool Spielbrett::setzeStein(int Spalte, Feld farbe) {
+
     if ( this->matrix[1][Spalte] != leer ) {
-        std::cout << "Die oberste Zeile ist schon voll" << std::endl;
+       // std::cout << "Die oberste Zeile ist schon voll" << std::endl;
+        return false;
     }
-#endif
 
     //Stein ganz unten einfuegen
     for (int i = (Zeil-1); i > 0; i-- ) {
         if ((*this)(i,Spalte) == leer) {
             (*this)(i,Spalte) = farbe;
+            return true;
+        }
+    }
+    
+    return false;
+
+}
+
+void Spielbrett::entferneStein(int Spalte) {
+
+    //Stein ganz oben loeschen
+    for (int i = (Zeil-1); i > 0; i-- ) {
+        if ((*this)(i,Spalte) != leer) {
+            (*this)(i,Spalte) = leer;
             return;
         }
     }
 
 
 }
+
 
 
 //Schaut sich die ersten 4 Feldfarben an und vergibt Punkte nach dem Schema der Heuristik
@@ -136,7 +151,9 @@ double Spielbrett::heuristischeBewertung(Feld farbe) {
             bereich.push_back((*this)(zeile,i+3));
             
             if (bereichIstGewonnen(bereich, farbe)) {return 1;}
-            if (bereichIstGewonnen(bereich, gegenfarbe)) {return -1;}
+            if (bereichIstGewonnen(bereich, gegenfarbe)) {
+                std::cout << "ICH USS HANDELN!!!" << std::endl;
+                return -1;}
             
             sum += punkteImBereich(bereich, farbe);
             sum -= punkteImBereich(bereich, gegenfarbe);
@@ -179,7 +196,7 @@ double Spielbrett::heuristischeBewertung(Feld farbe) {
 
 
     
-    std::cout << "Bewertung: " << sum << std::endl;
+   // std::cout << "Bewertung: " << sum << std::endl;
 
     return sum;
 }
@@ -187,10 +204,7 @@ double Spielbrett::heuristischeBewertung(Feld farbe) {
 
 bool Spielbrett::spielIstBeendet() 
 {
-    
-
-    
-    return false;
+    return fabs((*this).heuristischeBewertung(rot)) == 1;
 }
 
 
