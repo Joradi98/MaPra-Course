@@ -84,7 +84,7 @@ bool Spielbrett::addTile(int col, int color){
 void Spielbrett::entferneStein(int Spalte) {
 
     //Stein ganz oben loeschen
-    for (int i = 0; i < Zeil; i-- ) {
+    for (int i = 0; i < Zeil; i++ ) {
         if ((*this)(i,Spalte) != leer) {
             (*this)(i,Spalte) = leer;
             return;
