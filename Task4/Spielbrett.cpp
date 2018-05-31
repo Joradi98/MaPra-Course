@@ -54,9 +54,9 @@ void Spielbrett::setzeStein(int Spalte, Feld farbe) {
 #endif
 
     //Stein ganz unten einfuegen
-    for (int i = Zeil; i >= 1; i-- ) {
-        if (this->matrix[i][Spalte] == leer) {
-            this->matrix[i][Spalte] = farbe;
+    for (int i = (Zeil-1); i > 0; i-- ) {
+        if ((*this)(i,Spalte) == leer) {
+            (*this)(i,Spalte) = farbe;
             return;
         }
     }
@@ -64,19 +64,39 @@ void Spielbrett::setzeStein(int Spalte, Feld farbe) {
 
 }
 
-
+int Spielbrett::heuristischeBewertung(Feld farbe) {
+    int sum = 0;
+    
+    
+    
+    
+    
+    return sum;
+}
 
 
 
 bool Spielbrett::spielIstBeendet() 
 {
     
- /*  //Senkrecht
-    for (int i) {
-        
-    }*/
+    //Senkrecht
+    int streak = 1;
+    for (unsigned int spalte = 0; spalte < Spalt; spalte++ ) {
+        for (unsigned int i = 1; i < Zeil; i++) {
+            if ((*this)(i,spalte) == (*this)(i+1,spalte) && (*this)(i,spalte) != leer) {
+                streak++;
+                
+                if (streak >= 4) {
+                    std::cout << "GAME OVER" << std::endl;
+                }
+                
+            } else {
+                streak = 0;
+            }
+        }
+    }
 
-    (*this)(1,1);
+    
     return true;
 }
 

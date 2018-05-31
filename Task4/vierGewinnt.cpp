@@ -10,18 +10,19 @@ void NetzwerkMain();
  const unsigned int Schwierigkeitsgrad = 0;
 
 
-/*
-int errechneterZug(Spielbrett aktuellesSpielfeld) {
+
+int errechneBestenZug(Spielbrett aktuellesSpielfeld, Feld farbe) {
     //Krasse Berechnungen
-    return Spalte
+
+    return 0;
 }
 
-*/
+
 
 int main()
 {
-    int Zug, Gegenzug;
-
+    int nextMove, Gegenzug;
+    Feld meineFarbe, gegnerFarbe;
     // Netzwerkspiel? Rufe NetzwerkMain() auf.
 
     Start(Schwierigkeitsgrad);
@@ -29,6 +30,35 @@ int main()
     
     for(unsigned int Spiel = 1; Spiel <= AnzahlSpiele; Spiel++)
     {
+        Spielbrett brett = Spielbrett(6,7);
+        
+        
+        if (Spiel % 2 == 1) { //Wir fangen an mit gelb
+            meineFarbe = gelb;
+            gegnerFarbe = rot;
+
+            nextMove = errechneBestenZug(brett, meineFarbe); 
+            brett.setzeStein(nextMove, meineFarbe);
+        } else { //Das Programm der Umgebung unit.o beginnt mit gelb
+            meineFarbe = rot;
+            gegnerFarbe = gelb;
+            nextMove = -1;
+        }
+        
+        Gegenzug = NaechsterZug(nextMove);
+        
+        while (Gegenzug >= 0) { //Falls Spiel vorbei, wird kleiner Null zurueckgegeben
+            
+            brett.setzeStein(Gegenzug, gegnerFarbe);
+            
+            //nextMove = besterZug in aktuellem Spielfeld
+            nextMove = errechneBestenZug(brett, meineFarbe); 
+            brett.setzeStein(nextMove, meineFarbe);
+
+
+            Gegenzug = NaechsterZug(nextMove);
+
+        }
         /*while(spiel ist noch nicht vorbei) {
             std::cout << Spiel << std::endl;
 
