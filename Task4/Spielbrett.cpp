@@ -49,7 +49,7 @@ Feld& Spielbrett::operator () (size_t i, size_t j) {
 
 bool Spielbrett::setzeStein(int Spalte, Feld farbe) {
 
-    if ( this->matrix[1][Spalte] != leer ) {
+    if ( this->matrix[0][Spalte] != leer ) {
        // std::cout << "Die oberste Zeile ist schon voll" << std::endl;
         return false;
     }
@@ -66,24 +66,25 @@ bool Spielbrett::setzeStein(int Spalte, Feld farbe) {
 
 }
 
-Feld getColor(int i){
+Feld Spielbrett::getColor(int i){
     if(i == 0) return gelb;
     return rot;
 }
 
-int getColorId(Feld color){
+int Spielbrett::getColorId(Feld color){
     if(color == gelb) return 0;
     return 1;
 }
 
+
 bool Spielbrett::addTile(int col, int color){
-    setzeStein(col, getColor(color))
+    return setzeStein(col, getColor(color));
 }
 
 void Spielbrett::entferneStein(int Spalte) {
 
     //Stein ganz oben loeschen
-    for (int i = (Zeil-1); i > 0; i-- ) {
+    for (int i = 0; i < Zeil; i-- ) {
         if ((*this)(i,Spalte) != leer) {
             (*this)(i,Spalte) = leer;
             return;
@@ -193,14 +194,13 @@ double Spielbrett::heuristischeBewertung(Feld farbe) {
     for (unsigned int spalte = 3; spalte < Spalt; spalte++ ) {     // In jeder Spalte, sodass nach links noch 4 Elemente platz sind
         for (unsigned int i = 3; i < Zeil; i++) {                   // Starte in der 4. Zeile
             std::vector<Feld> bereich; //Konstruiere Bereich aus 4 diagonal aufeinanderdolgenden Feldern
-            bereich.push_back((*this)(i,spalte));}
+            bereich.push_back((*this)(i,spalte));
             bereich.push_back((*this)(i-1,spalte-1));                // Nach links oben wandern
             bereich.push_back((*this)(i-2,spalte-2));
             bereich.push_back((*this)(i-3,spalte-3));
 
             if (bereichIstGewonnen(bereich, farbe)) {return 1;}
             if (bereichIstGewonnen(bereich, gegenfarbe)) {return -1;}
-          }
             sum += punkteImBereich(bereich, farbe);
             sum -= punkteImBereich(bereich, gegenfarbe);
         }
