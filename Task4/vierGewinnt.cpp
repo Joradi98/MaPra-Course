@@ -11,9 +11,12 @@ void NetzwerkMain();
 
 
 
-int errechneBestenZug(Spielbrett aktuellesSpielfeld, Feld farbe) {
-    //Krasse Berechnungen
+int errechneBestenZug(Spielbrett brett, Feld farbe, int tiefe = 4) {
 
+    if (tiefe == 0 || brett.spielIstBeendet()) {
+        return brett.heuristischeBewertung(farbe);
+    }
+//    std::cout << brett.heuristischeBewertung(farbe) << std::endl;
     return 0;
 }
 
@@ -55,15 +58,10 @@ int main()
             nextMove = errechneBestenZug(brett, meineFarbe); 
             brett.setzeStein(nextMove, meineFarbe);
 
-
+            brett.heuristischeBewertung(meineFarbe);
             Gegenzug = NaechsterZug(nextMove);
 
         }
-        /*while(spiel ist noch nicht vorbei) {
-            std::cout << Spiel << std::endl;
-
-            //Kalkuliere naechsten Zug 
-        }*/
        
         
     }
