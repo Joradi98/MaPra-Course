@@ -17,33 +17,58 @@ double miniMax(Spielbrett brett, Feld farbe, std::vector<int>& besteZuege , int 
     
     //Wechlse noch mit min und max je nachdem ob u an der reihe bist
     if (tiefe == 0 || brett.spielIstBeendet()) {
-        std::cout << brett.heuristischeBewertung(farbe) << std::endl;
 
         return brett.heuristischeBewertung(farbe);
     }
     
-    double maxWert = -INFINITY;
-    // Generiere moegliche Zuege:
-    for (unsigned int i = 0; i < AnzahlSpalten; i++) {
-        if (brett.setzeStein(i, farbe) == true ) { //Sofern das ein gueltieger Zug ist
-            double wert = miniMax(brett, gegenfarbe, besteZuege, tiefe-1);
-           
-
-            brett.entferneStein(i);
-            if (wert >= maxWert) {
-                maxWert = wert;
-                
-                
-                if (tiefe == 4) {
-                    //Einer der besten Zuege
-                    besteZuege.push_back(i);
+    
+    if ( farbe == gelb ) {
+        double maxWert = -INFINITY;
+        // Generiere moegliche Zuege:
+        for (unsigned int i = 0; i < AnzahlSpalten; i++) {
+            if (brett.setzeStein(i, farbe) == true ) { //Sofern das ein gueltieger Zug ist
+                double wert = miniMax(brett, gegenfarbe, besteZuege, tiefe-1);
+               
+                brett.entferneStein(i);
+                if (wert >= maxWert) {
+                    maxWert = wert;
+                   
+                    if (tiefe == 4) {
+                        //Einer der besten Zuege
+                        besteZuege.push_back(i);
+                    }
+                    
                 }
-                
             }
         }
-    }
 
-    return maxWert;
+        return maxWert;
+
+    } else {
+        double minWert = +INFINITY;
+        // Generiere moegliche Zuege:
+        for (unsigned int i = 0; i < AnzahlSpalten; i++) {
+            if (brett.setzeStein(i, farbe) == true ) { //Sofern das ein gueltieger Zug ist
+                double wert = miniMax(brett, gegenfarbe, besteZuege, tiefe-1);
+               
+                brett.entferneStein(i);
+                if (wert <= minWert) {
+                    minWert = wert;
+                   
+                    if (tiefe == 4) {
+                        //Einer der besten Zuege
+                        besteZuege.push_back(i);
+                    }
+                    
+                }
+            }
+        }
+
+        return minWert;
+
+    }
+    
+    
 }
 
 

@@ -151,9 +151,7 @@ double Spielbrett::heuristischeBewertung(Feld farbe) {
             bereich.push_back((*this)(zeile,i+3));
             
             if (bereichIstGewonnen(bereich, farbe)) {return 1;}
-            if (bereichIstGewonnen(bereich, gegenfarbe)) {
-                std::cout << "ICH USS HANDELN!!!" << std::endl;
-                return -1;}
+            if (bereichIstGewonnen(bereich, gegenfarbe)) {return -1;}
             
             sum += punkteImBereich(bereich, farbe);
             sum -= punkteImBereich(bereich, gegenfarbe);
