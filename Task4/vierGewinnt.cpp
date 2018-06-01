@@ -8,98 +8,59 @@
 void NetzwerkMain();
 
 
-const unsigned int Schwierigkeitsgrad = 1;
+const unsigned int Schwierigkeitsgrad = 5;
 
 
-
-double miniMax(Spielbrett brett, Feld farbe, std::vector<int>& besteZuege , int tiefe = 4) {
-    Feld gegenfarbe  = farbe == rot ? gelb : rot;
-
-
-    //Wechlse noch mit min und max je nachdem ob u an der reihe bist
-    if (tiefe == 0 || brett.spielIstBeendet()) {
-
-        return brett.heuristischeBewertung(farbe);
-    }
-
-
-    if ( farbe == gelb ) {
-        double maxWert = -INFINITY;
-        // Generiere moegliche Zuege:
-        for (unsigned int i = 0; i < AnzahlSpalten; i++) {
-            if (brett.setzeStein(i, farbe) == true ) { //Sofern das ein gueltieger Zug ist
-                double wert = miniMax(brett, gegenfarbe, besteZuege, tiefe-1);
-
-                brett.entferneStein(i);
-                if (wert >= maxWert) {
-                    maxWert = wert;
-
-                    if (tiefe == 4) {
-                        //Einer der besten Zuege
-                        besteZuege.push_back(i);
-                    }
-
-                }
-            }
+void outputGameField(Spielbrett gameField){
+    for(int i = 0; i < 6; i++){
+        for(int j = 0; j < 7; j++){
+            std::cout << gameField(i, j) << " ";
         }
-
-        return maxWert;
-
-    } else {
-        double minWert = +INFINITY;
-        // Generiere moegliche Zuege:
-        for (unsigned int i = 0; i < AnzahlSpalten; i++) {
-            if (brett.setzeStein(i, farbe) == true ) { //Sofern das ein gueltieger Zug ist
-                double wert = miniMax(brett, gegenfarbe, besteZuege, tiefe-1);
-
-                brett.entferneStein(i);
-                if (wert <= minWert) {
-                    minWert = wert;
-
-                    if (tiefe == 4) {
-                        //Einer der besten Zuege
-                        besteZuege.push_back(i);
-                    }
-
-                }
-            }
-        }
-
-        return minWert;
-
+        std::cout << std::endl;
     }
-
-
 }
 
+template<typename T>
+void outputVector(std::vector<T> vec){
+    for(int i = 0; i < vec.size(); i++){
+        std::cout << vec[i] << ((i < vec.size() - 1) ? ", " : "\n");
+    }
+}
 
 int rows = 7;
+int DISCARD_ROW = -42;
 // max color is the color of the player MAX, the player we want to win
 double miniMax2(Spielbrett gameField, Feld maxColor, int currentColor, std::vector<int>& bestMoves, int layer, int searchDepth){
-    if(layer == maxLayer){
-        return gameField.heuristischeBewertung(maxColor);
+    double heuristicValue = gameField.heuristischeBewertung(maxColor);
+    if(heuristicValue == -1 || heuristicValue == 1 || layer == searchDepth){
+        return heuristicValue;
     }
-
-    std::vector<int> miniMaxValues;
+    std::vector<double> miniMaxValues;
     for(int i = 0; i < rows; i++){
         if(gameField.addTile(i, currentColor)){
-            miniMaxValues.push_back(miniMax2(gameField, 1 - currentColor, bestMoves, layer + 1, searchDepth));
+            double thisMove = miniMax2(gameField, maxColor, 1 - currentColor, bestMoves, layer + 1, searchDepth);
+            miniMaxValues.push_back(thisMove);
             gameField.entferneStein(i);
         }
+        else {
+            miniMaxValues.push_back(DISCARD_ROW);
+        }
     }
-
-    int miniMaxValue;
+    double miniMaxValue = 0;
+    std::vector<double> validMiniMaxValues;
+    for(int i = 0; i < miniMaxValues.size(); i++){
+        if(miniMaxValues[i] != DISCARD_ROW){
+            validMiniMaxValues.push_back(miniMaxValues[i]);
+        }
+    }
     if(layer % 2 == 0){
-        //MAX layer
-        miniMaxValue = std::max_element(miniMaxValues.begin(), miniMaxValues.end());
+        miniMaxValue = *std::max_element(validMiniMaxValues.begin(), validMiniMaxValues.end());
     } else {
-        //MIN layer
-        miniMaxValue = std::min_element(miniMaxValues.begin(), miniMaxValues.end());
+        miniMaxValue = *std::min_element(validMiniMaxValues.begin(), validMiniMaxValues.end());
     }
-
     if(layer == 0){
         for(int i = 0; i < miniMaxValues.size(); i++){
-            if(miniMaxValues[i] == miniMaxValue){
+            if(miniMaxValues[i] == miniMaxValue && !gameField.isColFull(i)){
                 bestMoves.push_back(i);
             }
         }
@@ -109,33 +70,22 @@ double miniMax2(Spielbrett gameField, Feld maxColor, int currentColor, std::vect
 }
 
 int errechneBestenZug(Spielbrett brett, Feld farbe) {
-
-    std::vector<int> besteZuege;
-    miniMax2(brett, farbe, getColorId(farbe), besteZuege, 0, 1);
-
-    std::cout << "Zuege: ";
-    for (auto i = besteZuege.begin(); i != besteZuege.end(); ++i)
-        std::cout << *i << ' ';
-    std::cout << std::endl;
-
-
-    return besteZuege[0];
+    std::vector<int> bestMoves;
+    miniMax2(brett, farbe, brett.getColorId(farbe), bestMoves, 0, 5);
+    //outputVector(bestMoves);
+    //outputGameField(brett);
+    //std::getchar();
+    return bestMoves[rand() % bestMoves.size()];
 }
 
 
-
-
-int main()
-{
+void startOfflineGame(){
     int nextMove, Gegenzug;
     Feld meineFarbe, gegnerFarbe;
-    // Netzwerkspiel? Rufe NetzwerkMain() auf.
 
     Start(Schwierigkeitsgrad);
 
-
-    for(unsigned int Spiel = 1; Spiel <= AnzahlSpiele; Spiel++)
-    {
+    for(unsigned int Spiel = 1; Spiel <= AnzahlSpiele; Spiel++){
         Spielbrett brett = Spielbrett(6,7);
 
 
@@ -156,6 +106,7 @@ int main()
         while (Gegenzug >= 0) { //Falls Spiel vorbei, wird kleiner Null zurueckgegeben
 
             brett.setzeStein(Gegenzug, gegnerFarbe);
+            //std::getchar();
 
             //nextMove = besterZug in aktuellem Spielfeld
             nextMove = errechneBestenZug(brett, meineFarbe);
@@ -164,10 +115,21 @@ int main()
             Gegenzug = NaechsterZug(nextMove);
 
         }
-
-
     }
+}
 
+int main(){
+    /*
+    bool networkGame = true;
+    if(networkGame){
+        NetzwerkMain();
+    }
+    else {
+        startOfflineGame();
+    }
+    return 0;
+    */
+    Spielbrett brett = Spielbrett(5, 5);
     return 0;
 }
 
@@ -175,16 +137,68 @@ enum class SpielStatus {
     Verbindungsfehler,
     Niederlage,
     Unentschieden,
-    Sieg
+    Sieg,
+    Running
 };
+
+void doNetworkGameMove(Spielbrett board, int myColor){
+    int col = errechneBestenZug(board, board.getColor(myColor));
+    board.addTile(col, myColor);
+    outputGameField(board);
+    SendeZug(col);
+}
+
+void doReceivedNetworkGameMove(Spielbrett board, int col, int myColor){
+    board.addTile(col, 1 - myColor);
+}
+
+SpielStatus getSpecialGameState(Spielbrett board, int myColor){
+    int heuristicValue = board.heuristischeBewertung(board.getColor(myColor));
+    if(heuristicValue == 1){
+        return SpielStatus::Sieg;
+    }
+    else if(heuristicValue == -1){
+        return SpielStatus::Niederlage;
+    }
+    //else if(board.isFull()){
+    //    return SpielStatus::Unentschieden;
+    //}
+    else {
+        return SpielStatus::Running;
+    }
+}
 
 // Spielt ein einzelnes Netzwerkspiel gegen einen anderen Computer im Netzwerk.
 // Sollte das Spiel beendet sein oder ein Netzwerkfehler auftreten, muss diese Methode
 // das zugehoerige Element der Enumeration SpielStatus zurueckgeben.
-SpielStatus Netzwerkspiel( Feld MeineFarbe ) {
+SpielStatus Netzwerkspiel( Feld color) {
+    Spielbrett board = Spielbrett(6, 7);
+    int myColor = board.getColorId(color);
+    if(myColor == 0){
+        doNetworkGameMove(board, myColor);
+    }
+    while(true){
+        outputGameField(board); std::getchar();
+        /*int receivedData = EmpfangeZug();
+        if(receivedData == SPIELENDE){
+            return getSpecialGameState(board, myColor);
+        }
+        else if(receivedData == VERBINDUNGSFEHLER){
+            return SpielStatus::Verbindungsfehler;
+        }
+        else if(receivedData >= 0 && receivedData < rows){
+            doReceivedNetworkGameMove(board, receivedData, myColor);
+        }*/
+        doReceivedNetworkGameMove(board, EmpfangeZug(), myColor);
+        outputGameField(board); std::getchar();
+/*
+        SpielStatus state = getSpecialGameState(board, myColor);
+        if(state != SpielStatus::Running){
+            return state;
+        }*/
+        doNetworkGameMove(board, myColor);
 
-    // TODO Implementiere Netzwerkprotokoll
-
+    }
     return SpielStatus::Verbindungsfehler;
 }
 

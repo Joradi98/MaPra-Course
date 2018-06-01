@@ -19,6 +19,8 @@ class Spielbrett
 		explicit Spielbrett (size_t m=1, size_t n=1);
 
 		bool spielIstBeendet();
+		bool isFull();
+		bool isColFull(int);
 
 		Feld& operator () (size_t, size_t);       			// Zugriff auf Einträge der Matrix
 

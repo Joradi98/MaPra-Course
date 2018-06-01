@@ -45,17 +45,29 @@ Feld& Spielbrett::operator () (size_t i, size_t j) {
     return matrix[i][j];
 }
 
+bool Spielbrett::isFull(){
+    for(int i = 0; i < Spalt; i++){
+        if(!isColFull(i)){
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Spielbrett::isColFull(int col){
+    return (*this)(0, col) != leer;
+}
 
 
 bool Spielbrett::setzeStein(int Spalte, Feld farbe) {
 
     if ( this->matrix[0][Spalte] != leer ) {
-       // std::cout << "Die oberste Zeile ist schon voll" << std::endl;
+        //std::cout << "Die oberste Zeile ist schon voll" << std::endl;
         return false;
     }
 
     //Stein ganz unten einfuegen
-    for (int i = (Zeil-1); i > 0; i-- ) {
+    for (int i = (Zeil-1); i >= 0; i-- ) {
         if ((*this)(i,Spalte) == leer) {
             (*this)(i,Spalte) = farbe;
             return true;
@@ -65,6 +77,8 @@ bool Spielbrett::setzeStein(int Spalte, Feld farbe) {
     return false;
 
 }
+
+
 
 Feld Spielbrett::getColor(int i){
     if(i == 0) return gelb;
@@ -134,6 +148,21 @@ bool bereichIstGewonnen(std::vector<Feld> v, Feld farbe) {
     return (streak == 4) ? 1 : 0;
 }
 
+/*
+double Spielbrett::heuristicValue(Feld color){
+    double twoTilesScore = 0.2;
+    double threeTilesScore = 0.7;
+
+
+
+    for(int i = 0; i < Zeil; i++){
+        for(int j = 0; j < Spalt; j++){
+
+        }
+    }
+    return 0;
+}
+*/
 double Spielbrett::heuristischeBewertung(Feld farbe) {
     double sum = 0;
 
