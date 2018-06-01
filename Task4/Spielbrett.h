@@ -19,6 +19,7 @@ class Spielbrett
 		explicit Spielbrett (size_t m=1, size_t n=1);
 
 		bool spielIstBeendet();
+		bool hatGewonnen(Feld);
 		bool isFull();
 		bool isColFull(int);
 

@@ -46,7 +46,7 @@ Feld& Spielbrett::operator () (size_t i, size_t j) {
 }
 
 bool Spielbrett::isFull(){
-    for(int i = 0; i < Spalt; i++){
+    for(unsigned int i = 0; i < Spalt; i++){
         if(!isColFull(i)){
             return false;
         }
@@ -98,7 +98,7 @@ bool Spielbrett::addTile(int col, int color){
 void Spielbrett::entferneStein(int Spalte) {
 
     //Stein ganz oben loeschen
-    for (int i = 0; i < Zeil; i++ ) {
+    for (unsigned int i = 0; i < Zeil; i++ ) {
         if ((*this)(i,Spalte) != leer) {
             (*this)(i,Spalte) = leer;
             return;
@@ -242,10 +242,15 @@ double Spielbrett::heuristischeBewertung(Feld farbe) {
     return sum;
 }
 
+bool Spielbrett::hatGewonnen(Feld farbe) {
+    return (*this).heuristischeBewertung(farbe) == 1;
+}
+
+
 
 bool Spielbrett::spielIstBeendet()
 {
-    return fabs((*this).heuristischeBewertung(rot)) == 1;
+    return ( fabs((*this).heuristischeBewertung(rot)) == 1 || (*this).isFull() );
 }
 
 
