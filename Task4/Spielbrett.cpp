@@ -148,21 +148,6 @@ bool bereichIstGewonnen(std::vector<Feld> v, Feld farbe) {
     return (streak == 4) ? 1 : 0;
 }
 
-/*
-double Spielbrett::heuristicValue(Feld color){
-    double twoTilesScore = 0.2;
-    double threeTilesScore = 0.7;
-
-
-
-    for(int i = 0; i < Zeil; i++){
-        for(int j = 0; j < Spalt; j++){
-
-        }
-    }
-    return 0;
-}
-*/
 double Spielbrett::heuristischeBewertung(Feld farbe) {
     double sum = 0;
 

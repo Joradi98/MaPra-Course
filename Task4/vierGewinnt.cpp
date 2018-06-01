@@ -8,7 +8,7 @@
 void NetzwerkMain();
 
 
-const unsigned int Schwierigkeitsgrad = 5;
+const unsigned int Schwierigkeitsgrad = 4;
 
 
 void outputGameField(Spielbrett gameField){
@@ -28,7 +28,7 @@ void outputVector(std::vector<T> vec){
 }
 
 int rows = 7;
-int DISCARD_ROW = -42;
+int DISCARD_ROW = -42; //Falls eine Spalte keinen gueltigen Zug darstellt, wird ihr dieser Wert zugeordnet
 
 // max color is the color of the player MAX, the player we want to win
 double miniMax2(Spielbrett gameField, Feld maxColor, int currentColor, std::vector<int>& bestMoves, int layer, int searchDepth){
@@ -47,22 +47,25 @@ double miniMax2(Spielbrett gameField, Feld maxColor, int currentColor, std::vect
             miniMaxValues.push_back(DISCARD_ROW);
         }
     }
+    
     double miniMaxValue = 0;
     std::vector<double> validMiniMaxValues;
     for(unsigned int i = 0; i < miniMaxValues.size(); i++){
         if(miniMaxValues[i] != DISCARD_ROW){
-            validMiniMaxValues.push_back(miniMaxValues[i]);
+            validMiniMaxValues.push_back(miniMaxValues[i]); //Sammle alle minimax ergebnisse der gueltigen Zuege
         }
     }
+    
     if(layer % 2 == 0){
-        miniMaxValue = *std::max_element(validMiniMaxValues.begin(), validMiniMaxValues.end());
+        miniMaxValue = *std::max_element(validMiniMaxValues.begin(), validMiniMaxValues.end()); //max Wert
     } else {
-        miniMaxValue = *std::min_element(validMiniMaxValues.begin(), validMiniMaxValues.end());
+        miniMaxValue = *std::min_element(validMiniMaxValues.begin(), validMiniMaxValues.end()); //min Wer
     }
+    
     if(layer == 0){
         for(unsigned int i = 0; i < miniMaxValues.size(); i++){
             if(miniMaxValues[i] == miniMaxValue && !gameField.isColFull(i)){
-                bestMoves.push_back(i);
+                bestMoves.push_back(i); // Sammle alle gueltigen Spalten, die zu extremaler Bewertung fuehren
             }
         }
     }
