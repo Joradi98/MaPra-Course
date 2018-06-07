@@ -29,11 +29,11 @@ int addElement(std::vector<element>& universe, std::vector<element>& solution, i
         }
     }
     if(bestElementIndex > -1){
-        std::cout << "adding: " << universe[bestElementIndex] << " (i = " << currentIteration << ") " << std::endl;
+        std::cout << "adding: " << universe[bestElementIndex] << std::endl;
         universe[bestElementIndex].used = true;
         universe[bestElementIndex].lastMoved = currentIteration;
         solution.push_back(universe[bestElementIndex]);
-        currentSolutionValue += solution[bestElementIndex].cost;
+        currentSolutionValue += universe[bestElementIndex].cost;
         return bestElementIndex;
     }
     return -1;
@@ -50,7 +50,7 @@ int removeElement(std::vector<element>& solution, int& currentSolutionValue, int
         }
     }
     if(worstElementIndex > -1){
-        std::cout << "erasing: " << solution[worstElementIndex] << " (i = " << currentIteration << ") " << std::endl;
+        std::cout << "erasing: " << solution[worstElementIndex] << std::endl;
         solution[worstElementIndex].used = false;
         solution[worstElementIndex].lastMoved = currentIteration;
         solution.erase(solution.begin() + worstElementIndex);
@@ -66,6 +66,7 @@ std::vector<element> tabuSearch(std::vector<element>& universe, int capacity, in
     int currentSolutionValue = 0;
     int currentOptimalSolutionValue = 0;
     for(int i = 0; i < iterations; i++){
+        std::cout << "iteration " << i << ".. solution value: " << currentSolutionValue << std::endl;
         int index = addElement(universe, currentSolution, currentSolutionValue, capacity, tabuLength, i);
         if(index == -1){
             index = removeElement(currentSolution, currentSolutionValue, tabuLength, i);
@@ -103,7 +104,7 @@ int main(int argc, char* argv[]){
     for(int i = 0; i < numElements; i++){
         element e;
         stream >> e.profit >> e.cost;
-        e.lastMoved = 0;
+        e.lastMoved = -tabuLength;
         e.used = false;
         universe.push_back(e);
     }
