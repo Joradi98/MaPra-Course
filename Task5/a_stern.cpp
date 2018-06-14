@@ -4,6 +4,8 @@
 #include <map>
 #include <set>
 #include <fstream>
+#include <algorithm>    // std::set_difference
+
 
 // Ein Graph, der Koordinaten von Knoten speichert.
 /*
@@ -67,45 +69,47 @@ public:
     }
 };
 
-// TODO: why costToStart is a vector ??? this isn't generalized at all..
+// TODO: this is bullshit according to the wanted "general type" VertexT
 // we should have an option to iterate other the verticies, tho...
 void Dijkstra(const DistanceGraph& g, VertexT start, std::vector<CostT>& costToStart) {
     std::set<VertexT> visitedVerticies;
     visitedVerticies.insert(start);
-    // TODO: this is bullshit according to the wanted "general type" VertexT
+
     for(VertexT i = 0; i < g.numVertices(); i++){
-        costToStart.push_back(infty);
+        costToStart.push_back(g.cost(start, i)); //Initialize with direct distances from the graph
     }
     costToStart[start] = 0;
     std::getchar();
+
+    // As long as we have not visited all vertices
     while(visitedVerticies.size() < g.numVertices()){
-        CostT minCost = infty;
-        VertexT minCostVertex = start;
         std::set<VertexT>::iterator it;
         std::set<VertexT> unexploredVerticies;
-        for(it = visitedVerticies.begin(); it != visitedVerticies.end(); it++){
-            DistanceGraph::NeighborT neighbors = g.getNeighbors(*it);
-            std::cout << "neihbors of: " << *it << " >> ";
-            for(unsigned int i = 0; i < neighbors.size(); i++){
-                VertexT neighbor = neighbors[i].first;
-                std::cout << neighbor << ", ";
-                if(visitedVerticies.find(neighbor) == visitedVerticies.end()){
-                    unexploredVerticies.insert(neighbor);
-                    if(costToStart[neighbor] < minCost){
-                        minCost = costToStart[neighbor];
-                        minCostVertex = neighbor;
-                    }
-                }
+        
+        //Get all the unvisited vertices
+        // As long as all of the vertices are named {1,...,N} this works, but this ia not really general.
+        for (VertexT i=0; i < g.numVertices(); i++) {
+            if(visitedVerticies.find(i) == visitedVerticies.end()){
+                unexploredVerticies.insert(i);
             }
-            std::cout << std::endl;
         }
-        std::getchar();
-        if(unexploredVerticies.empty()){
-            break;
+        if (unexploredVerticies.size() == 0) { break; }
+    
+        // Choose a random vertex at the beginning.
+        VertexT minCostVertex = *unexploredVerticies.begin();
+        CostT minCost = costToStart[minCostVertex];
+
+        //Now get the minimum vertex
+        for(it = unexploredVerticies.begin(); it != unexploredVerticies.end(); it++){
+            if(costToStart[*it] < minCost){
+                minCost = costToStart[*it];
+                minCostVertex = *it;
+            }
         }
+        
+        //Update values
         visitedVerticies.insert(minCostVertex);
         for(it = unexploredVerticies.begin(); it != unexploredVerticies.end(); it++){
-            //std::cout << "cost(" << *it << ") = " << costToStart[*it] << " > " << "cost(" << minCostVertex << ") + g.cost(" << minCostVertex << ", " << *it << ") = " << costToStart[minCostVertex] << " + " << g.cost(minCostVertex, *it) << " ? " << std::endl;
             if(costToStart[*it] > costToStart[minCostVertex] + g.cost(minCostVertex, *it)){
                 costToStart[*it] = costToStart[minCostVertex] + g.cost(minCostVertex, *it);
             }
