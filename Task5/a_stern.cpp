@@ -5,7 +5,7 @@
 #include <set>
 #include <fstream>
 #include <algorithm>    // std::set_difference
-
+#include <iostream>
 
 // Ein Graph, der Koordinaten von Knoten speichert.
 /*
@@ -79,7 +79,6 @@ void Dijkstra(const DistanceGraph& g, VertexT start, std::vector<CostT>& costToS
         costToStart.push_back(g.cost(start, i)); //Initialize with direct distances from the graph
     }
     costToStart[start] = 0;
-    std::getchar();
 
     // As long as we have not visited all vertices
     while(visitedVerticies.size() < g.numVertices()){
@@ -148,9 +147,14 @@ int main()
             coordinateData.push_back(std::pair<double, double>(x, y));
         }
         CoordinateGraph graph = CoordinateGraph(numVertices, coordinateData, graphData);
-        std::vector<CostT> costs;
-        Dijkstra(graph, 0, costs);
-        PruefeDijkstra(example, 0, costs);
+        
+        for(VertexT i = 0; i < graph.numVertices(); i++){
+            std::vector<CostT> costs;
+            Dijkstra(graph, i, costs); //Start Dijkstra from each vertex
+            PruefeDijkstra(example, i, costs);
+            std::getchar();
+        }
+
     }
     else {
         std::cout << "error reading file.";
