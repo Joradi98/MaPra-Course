@@ -46,7 +46,7 @@ public:
     }
 
     CostT estimatedCost(VertexT from, VertexT to) const {
-        return 0;
+        return 42424242;
     }
 
     CostT cost(VertexT from, VertexT to) const {
@@ -67,6 +67,18 @@ public:
     std::pair<double, double> getCoordinates(VertexT v){
         return coordinates.at(v);
     }
+    
+    CostT estimatedCost(VertexT from, VertexT to) const {
+        std::pair<double, double> firstCoordinate = coordinates.at(from);
+        std::pair<double, double> secondCoordinate = coordinates.at(to);
+
+        double xDifference = (firstCoordinate.first-secondCoordinate.first);
+        double yDifference = (firstCoordinate.second-secondCoordinate.second);
+
+        return sqrt( xDifference*xDifference + yDifference*yDifference);
+        
+    }
+
 };
 
 // TODO: this is bullshit according to the wanted "general type" VertexT
@@ -147,7 +159,7 @@ int main()
             coordinateData.push_back(std::pair<double, double>(x, y));
         }
         CoordinateGraph graph = CoordinateGraph(numVertices, coordinateData, graphData);
-        
+        PruefeHeuristik(graph);
         for(VertexT i = 0; i < graph.numVertices(); i++){
             std::vector<CostT> costs;
             Dijkstra(graph, i, costs); //Start Dijkstra from each vertex
