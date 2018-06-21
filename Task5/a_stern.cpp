@@ -128,9 +128,73 @@ void Dijkstra(const DistanceGraph& g, VertexT start, std::vector<CostT>& costToS
     }
 }
 
+class MazeGraph : public BasicStaticGraph {
+public:
+
+    MazeGraph(int num_verts, std::vector<std::pair<EdgeT, CostT>>& edgeData) : BasicStaticGraph(num_verts, edgeData) {
+        // todo sth?
+    }
+    
+    CostT estimatedCost(VertexT from, VertexT to) const {
+        // todo implement heuristic
+        return 1;
+    }
+};
+
+
+
+class VertexComparator {
+public:
+    DistanceGraph* context;
+    std::vector<VertexT> gValues;
+    VertexT target;
+    VertexComparator(const VertexT& target, const DistanceGraph& context){
+        this -> target = target;
+        *(this -> context) = context;
+        for(unsigned int i = 0; i < context.numVertices(); i++){
+            gValues.push_back(infty);
+        }
+    } 
+
+    bool operator()(const VertexT& a, const VertexT&b) const {
+        return gValues[a] + context -> estimatedCost(a, target) < gValues[b] + context -> estimatedCost(b, target); 
+    }
+};
+
+
 bool A_star(const DistanceGraph& g, GraphVisualizer& v, VertexT start, VertexT ziel, std::list<VertexT>& weg) {
-    // ...
-    return false; // Kein Weg gefunden.
+    int COST = 1;
+    std::vector<VertexT> seenNodes;
+    std::vector<VertexT> exploredNodes;
+    VertexComparator comparator = VertexComparator(ziel, g);
+    seenNodes.push_back(start);
+    std::make_heap(seenNodes, VertexComparator());
+    for(unsigned int i = 0; i < g.numVertices(); i++){
+        comparator.gValues.push_back(infty);
+    }
+    while(!seenNodes.empty()){
+        VertexT minfVertex = seenNodes.front();
+        exploredNodes.push_back(minfVertex);
+        if(minfVertex == ziel){
+            // todo: reconstruct path
+            return true;
+        }
+        std::pop_heap(seenNodes.begin(), seenNodes.end(), VertexComparator());
+        seenNodes.pop_back();
+        std::vector<std::pair<VectorT, CostT>> neighbors = g.getNeighbors(minfVertex);
+        for(int i = 0; i < neighbors.size(); i++){
+            if(exploredNodes.find(exploredNodes.begin(), exploredNodes.end(), neighbors[i][0]) == exploredNodes.end()){
+                if(seenNodes.find(seenNodes.begin(), seenNodes.end(), neighbors[i][0] == seenNodes.end()){
+                    seenNodes.push_back(neighbors[i][0]);
+                    std::push_heap(seenNodes.begin(), seenNodes.end()); 
+                }
+                else {
+                    comparator.gValues[neighbors[i][0]] = comparator.gValues[minfVertex] + COST;  
+                }
+            }
+        }          
+    }
+    return false;
 }
 
 int main()
