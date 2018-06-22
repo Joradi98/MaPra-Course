@@ -300,6 +300,7 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
 
 
     std::vector<VertexT> gValues;
+
     for(unsigned int i = 0; i < g.numVertices(); i++){
         gValues.push_back(infty);
     }
@@ -378,6 +379,7 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
                 openElements.push_back(neighbourElement);
                 openVertices.insert(neighbourElement.vertex);
                 std::push_heap(openElements.begin(), openElements.end(),Comparator()); 
+
             }
    
             
@@ -444,11 +446,7 @@ int main()
     MazeGraph graph = MazeGraph(mazeData,5);
     
     // PruefeHeuristik
-   // PruefeHeuristik(graph);
 
-
-    // Loese die in der Aufgabenstellung beschriebenen Probleme fuer die jeweilige Datei
-    // PruefeDijkstra / PruefeWeg
 
     return 0;
 }
