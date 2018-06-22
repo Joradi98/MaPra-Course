@@ -323,15 +323,15 @@ struct CompararingInstance {
     VertexT vertex;                // The actual graph this instance represents  
     VertexT target;                // The target where you wanna go at the end
     DistanceGraph *contextGraph;  // The graph in which this vertex can be found. Needed to estimate distances
-    std::vector<VertexT> *gValues;  //gValues get changed, so only hold a pointer
+    int fValue;  //gValues get changed, so only hold a pointer
     
     int vorgaenger;
     
-    CompararingInstance(VertexT vertex, VertexT target, DistanceGraph *contextGraph, std::vector<VertexT> *gValues) {
+    CompararingInstance(VertexT vertex, VertexT target, DistanceGraph *contextGraph, int fValue) {
         this->vertex = vertex;
         this->target = target;
         this->contextGraph = contextGraph;
-        this->gValues = gValues;
+        this->fValue = fValue;
         
         this->vorgaenger = -1;
 
@@ -341,7 +341,7 @@ struct CompararingInstance {
 
 struct Comparator {
     bool operator()(const CompararingInstance &a, const CompararingInstance &b) const {
-        return (*a.gValues)[a.vertex] + a.contextGraph->estimatedCost(a.vertex, a.target) > (*b.gValues)[b.vertex] + b.contextGraph->estimatedCost(b.vertex, b.target); 
+        return a.fValue > a.fValue; 
     }
 };
 
@@ -355,105 +355,88 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
     std::list<VertexT> weg;
 
     
-    std::vector<CompararingInstance> openElements;
-    std::vector<CompararingInstance> exploredElements;
-    std::set<VertexT> openVertices;
-    std::set<VertexT> exploredVertices;
+    std::vector<VertexT> openVertices;
+    std::vector<VertexT> closedVertices;
 
+    std::map<VertexT, VertexT> cameFrom; 
+    std::map<VertexT, CostT> gScore; 
+    std::map<VertexT, CostT> fScore; 
 
-    std::vector<VertexT> gValues;
-    for(unsigned int i = 0; i < g.numVertices(); i++){
+    
+    //Init gScores
+    for (VertexT i = 0; i < g.numVertices(); i++) {
         if (i == start ) {
-            gValues.push_back(0);
+            gScore[i] = 0;
         } else {
-            gValues.push_back(infty);
+            gScore[i] = infty;
         }
-
     }
-    
-    
-    CompararingInstance startElement = CompararingInstance(start, ziel, &g, &gValues); //Construct starting element
 
-    openElements.push_back(startElement); //Enquere starting element
-    openVertices.insert(start);
-    std::make_heap(openElements.begin(),openElements.end(), Comparator() ); //Make heap
+    //Init fScores
+    for (VertexT i = 0; i < g.numVertices(); i++) {
+        if (i == start ) {
+            fScore[i] = g.estimatedCost(start, ziel);
+        } else {
+            fScore[i] = infty;
+        }
+    }
+
+    openVertices.push_back(start);
     
-    
-    while ( !openElements.empty() ) {
-        std::pop_heap(openElements.begin(), openElements.end(), Comparator()); //Moves highest element to the end
-        CompararingInstance minfElement = openElements.back();
+    while (!openVertices.empty()) {
+        VertexT current = openVertices.back();
+        // Get the node in openSet having the lowest fScore[] value
+        for (unsigned int i = 0; i < openVertices.size(); i++) {
+            VertexT instance = openVertices.at(i);
+            if (fScore.at(instance) < fScore.at(current) ){
+                current = instance;
+            }
+        }
         
-        
-        openElements.pop_back();      //Pops last element
-        exploredElements.push_back(minfElement);
-        exploredVertices.insert(minfElement.vertex);
-        
-        if ( minfElement.vertex == ziel ) {
-            CompararingInstance vorher = minfElement;
-            weg.push_back(ziel);
-            while ( vorher.vorgaenger >= 0 ) {
-                //std::cout << vorher.vertex << std::endl ;
-                vorher = exploredElements.at(vorher.vorgaenger);
-                weg.push_back(vorher.vertex);
+        if ( current == ziel ) {
+            VertexT vorher = ziel;
+            weg.push_back(vorher);
+            while ( cameFrom.count(vorher) > 0 ) {
+               // std::cout << "Count: " << cameFrom.count(vorher) << std::endl;
+                vorher = cameFrom.at(vorher);
+                weg.push_back(vorher);
             }
             weg.reverse();
             return weg;
         }
         
-        //Expand to neighbours
-        // überprüft alle Nachfolgeknoten und fügt sie der Open List hinzu, wenn entweder
-        // - der Nachfolgeknoten zum ersten Mal gefunden wird oder
-        // - ein besserer Weg zu diesem Knoten gefunden wird        
-        std::vector<std::pair<VertexT, CostT>> neighbors = g.getNeighbors(minfElement.vertex);
+        openVertices.erase(std::find(openVertices.begin(),openVertices.end(),current) );
+        closedVertices.push_back(current);
+        
+        std::vector<std::pair<VertexT, CostT>> neighbors = g.getNeighbors(current);
         for(unsigned int i = 0; i < neighbors.size(); i++){
-           // std::cout << "Neighbour:" << std::endl;
-            //std::cout << neighbors[i].first << std::endl;
-            //CompararingInstance(neighbors[i].first, ziel, &g,&gValues);
-            CompararingInstance neighbourElement = CompararingInstance(neighbors[i].first, ziel, &g,&gValues); //Construct neighbour element
-            if(exploredVertices.find(neighbourElement.vertex) != exploredVertices.end() ){ 
+            VertexT neighbor = neighbors[i].first;
+            // if neighbor in closedSet
+            if ( std::find(closedVertices.begin(), closedVertices.end(), neighbor) != closedVertices.end()  ) {
                 continue;
-            }     
-            double tentative_g = gValues[minfElement.vertex] + g.cost(minfElement.vertex, neighbourElement.vertex);  
-            
-            // Alternative 1
-           /* if (openVertices.find(neighbourElement.vertex) == openVertices.end()) {
-                openElements.push_back(neighbourElement);
-                openVertices.insert(neighbourElement.vertex);
             }
-
-            if ( tentative_g >= gValues[neighbourElement.vertex] ) {
-                std::cout << "lame" << std::endl;
+            // if neighbor not in openSet	// Discover a new node
+            if ( std::find(openVertices.begin(), openVertices.end(), neighbor) == openVertices.end()  ) {
+                openVertices.push_back(neighbor);
+            }
+            
+            
+            double tentative_gScore = gScore.at(current) + g.estimatedCost(current, neighbor);
+            
+            if (tentative_gScore >= gScore.at(neighbor) ) {
                 continue;
             }
             
-            neighbourElement.vorgaenger = exploredElements.size()-1 ;
-            // std::cout << "Setze Weg von " << minfElement.vertex << " nach " << neighbourElement.vertex << std::endl;
-            gValues[neighbourElement.vertex] = tentative_g;
-            std::make_heap(openElements.begin(),openElements.end(), Comparator() );*/ //Make heap again to update f value                
-
+            cameFrom[neighbor] = current;
+            gScore[neighbor] = tentative_gScore;
+            fScore[neighbor] = gScore[neighbor] + g.estimatedCost(neighbor, ziel);
             
-            
-            //Alternative 2
-            if(openVertices.find(neighbourElement.vertex) != openVertices.end()  && tentative_g >= gValues[neighbourElement.vertex]  ){
-                continue;
-            }
-
-            neighbourElement.vorgaenger = exploredElements.size()-1 ;
-            // std::cout << "Setze Weg von " << minfElement.vertex << " nach " << neighbourElement.vertex << std::endl;
-            gValues[neighbourElement.vertex] = tentative_g;
-                        
-            if(openVertices.find(neighbourElement.vertex) != openVertices.end() ){
-                std::make_heap(openElements.begin(),openElements.end(), Comparator() ); //Make heap again to update f value                
-            } else {
-                // Insert
-                openElements.push_back(neighbourElement);
-                openVertices.insert(neighbourElement.vertex);
-                std::push_heap(openElements.begin(), openElements.end(),Comparator()); 
-            }
-            
-        }         
-
+        }
+        
     }
+
+
+
     
     std::cout << "A* finished without finding a way" << std::endl;
     return weg;
