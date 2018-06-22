@@ -54,14 +54,38 @@ public:
     }
 };
 
+
+inline double getDist(double lat1,double long1,double lat2,double long2) {
+    /// @brief The usual PI/180 constant
+    static const double DEG_TO_RAD = 0.017453292519943295769236907684886;
+    /// @brief Earth's quatratic mean radius for WGS-84
+    static const double EARTH_RADIUS_IN_METERS = 1; //6372797.560856
+
+    double latitudeArc  = (lat1 - lat2) * DEG_TO_RAD;
+    double longitudeArc = (long1 - long2) * DEG_TO_RAD;
+    double latitudeH = sin(latitudeArc * 0.5);
+    latitudeH *= latitudeH;
+    double lontitudeH = sin(longitudeArc * 0.5);
+    lontitudeH *= lontitudeH;
+    double tmp = cos(lat1*DEG_TO_RAD) * cos(lat2*DEG_TO_RAD);
+    return EARTH_RADIUS_IN_METERS*2.0 * asin(sqrt(latitudeH + tmp*lontitudeH));
+}
+
+
+
+
+
+
 class CoordinateGraph : public BasicStaticGraph {
 public:
     std::map<VertexT, std::pair<double, double>> coordinates;
+    int example;
 public:
-    CoordinateGraph(int num_verts, std::vector<std::pair<double, double>> coordinateData, std::vector<std::pair<EdgeT, CostT>> edgeData) : BasicStaticGraph(num_verts, edgeData) {
+    CoordinateGraph(int num_verts, std::vector<std::pair<double, double>> coordinateData, std::vector<std::pair<EdgeT, CostT>> edgeData, int example) : BasicStaticGraph(num_verts, edgeData) {
         for(unsigned int i = 0; i < coordinateData.size(); i++){
             coordinates[i] = coordinateData[i];
         }
+        this->example = example;
     }
 
 
@@ -72,12 +96,23 @@ public:
     CostT estimatedCost(VertexT from, VertexT to) const {
         std::pair<double, double> firstCoordinate = coordinates.at(from);
         std::pair<double, double> secondCoordinate = coordinates.at(to);
-
         double xDifference = fabs(firstCoordinate.first-secondCoordinate.first);
         double yDifference = fabs(firstCoordinate.second-secondCoordinate.second);
 
-        return sqrt( xDifference*xDifference + yDifference*yDifference);
+        if (example == 1) {
+
+            return sqrt( xDifference*xDifference + yDifference*yDifference);
+
+        } else if (example == 2) {
+            return getDist(firstCoordinate.first, firstCoordinate.second, secondCoordinate.first, secondCoordinate.second);            
+        } else if (example == 3) {
+            return sqrt( xDifference*xDifference + yDifference*yDifference);
+        } else if (example == 4) {
+            return sqrt( xDifference*xDifference + yDifference*yDifference);
+
+        }
         
+        return 42;
     }
 
 };
@@ -185,7 +220,7 @@ public:
 
     //Creates a maze where each tile is a vetex, nomatter if its passable or not. 
     //Costs are 1 is poassable and 0 if not.
-    MazeGraph(std::vector<CellType> mazeData, int breite) : CoordinateGraph(mazeData.size(), coordinatesFromMazeData(mazeData, breite), costsFromMazeData(mazeData, breite)) {}
+    MazeGraph(std::vector<CellType> mazeData, int breite, int example) : CoordinateGraph(mazeData.size(), coordinatesFromMazeData(mazeData, breite), costsFromMazeData(mazeData, breite), example) {}
     
     CostT estimatedCost(VertexT from, VertexT to) const {
         // todo implement heuristic
@@ -293,17 +328,21 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
     
     std::vector<CompararingInstance> openElements;
     std::vector<CompararingInstance> exploredElements;
-
-
     std::set<VertexT> openVertices;
     std::set<VertexT> exploredVertices;
 
 
     std::vector<VertexT> gValues;
 
-    for(unsigned int i = 0; i < g.numVertices(); i++){
-        gValues.push_back(infty);
+    for(unsigned int i = 1; i < g.numVertices(); i++){
+        if (i == start ) {
+            gValues.push_back(0);
+        } else {
+            gValues.push_back(infty);
+        }
+
     }
+    
     CompararingInstance startElement = CompararingInstance(start, ziel, &g, &gValues); //Construct starting element
 
     openElements.push_back(startElement); //Enquere starting element
@@ -315,26 +354,26 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
         std::pop_heap(openElements.begin(), openElements.end(), Comparator()); //Moves highest element to the end
         CompararingInstance minfElement = openElements.back();
         openElements.pop_back();      //Pops last element
+
         
         exploredElements.push_back(minfElement);
         exploredVertices.insert(minfElement.vertex);
+        
         if ( minfElement.vertex == ziel ) {
             // todo: reconstruct path
             CompararingInstance vorher = minfElement;
             weg.push_back(ziel);
             while ( vorher.vorgaenger >= 0 ) {
-                std::cout << vorher.vertex;
+                std::cout << vorher.vertex << std::endl ;
                 vorher = exploredElements.at(vorher.vorgaenger);
                 weg.push_back(vorher.vertex);
-                if (vorher.vertex == start) {  break; }
+
+//                if (vorher.vertex == start) {  break; }
                 //std::cout << " hat vorgaegner: " << vorher.vertex << std::endl;
               //  std::getchar();
             }
             weg.reverse();
           //  std::cout << " hat vorgaegner: " << minfElement.vorgaenger->vertex << std::endl;
-
-            
-            
             return weg;
         }
         
@@ -351,7 +390,8 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
             }   
         
             double tentative_g = gValues[minfElement.vertex] + g.cost(minfElement.vertex, neighbourElement.vertex);  
-            if(openVertices.find(neighbourElement.vertex) != openVertices.end()  && tentative_g > gValues[neighbourElement.vertex]  ){
+            
+            if(openVertices.find(neighbourElement.vertex) != openVertices.end()  && tentative_g >= gValues[neighbourElement.vertex]  ){
                 continue;
             }
         
@@ -360,26 +400,12 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
             gValues[neighbourElement.vertex] = tentative_g;
                         
             if(openVertices.find(neighbourElement.vertex) != openVertices.end() ){
-                //Decrease key, i.e. remove first and then reinsert with better key
-                for (unsigned int k = 0; k < openElements.size(); k++) {
-                    if ( openElements[k].vertex == neighbourElement.vertex ) {
-                       /* openElements.erase(openElements.begin()+k);
-                        openElements.push_back(neighbourElement);
-                        openVertices.insert(neighbourElement.vertex);
-                        std::push_heap(openElements.begin(), openElements.end(),Comparator()); */
-                        std::make_heap(openElements.begin(),openElements.end(), Comparator() ); //Make heap again
-                        break;
-                    }
-
-                }
-                
-                
+                std::make_heap(openElements.begin(),openElements.end(), Comparator() ); //Make heap again to update f value                
             } else {
                 // Insert
                 openElements.push_back(neighbourElement);
                 openVertices.insert(neighbourElement.vertex);
                 std::push_heap(openElements.begin(), openElements.end(),Comparator()); 
-
             }
    
             
@@ -393,9 +419,6 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
 
 int main()
 {
-
-    
-    
     int example = 0;
     std::cout << "enter [1-4] >> ";
     std::cin >> example;
@@ -419,7 +442,7 @@ int main()
             file >> x >> y;
             coordinateData.push_back(std::pair<double, double>(x, y));
         }
-        CoordinateGraph graph = CoordinateGraph(numVertices, coordinateData, graphData);
+        CoordinateGraph graph = CoordinateGraph(numVertices, coordinateData, graphData, example);
         PruefeHeuristik(graph);
       
         for(VertexT i = 0; i < graph.numVertices(); i++){
@@ -442,8 +465,8 @@ int main()
     }
     
     
-    std::vector<CellType> mazeData = ErzeugeLabyrinth(5, 10, 23453);
-    MazeGraph graph = MazeGraph(mazeData,5);
+   // std::vector<CellType> mazeData = ErzeugeLabyrinth(5, 10, 23453);
+   // MazeGraph graph = MazeGraph(mazeData,5);
     
     // PruefeHeuristik
 
