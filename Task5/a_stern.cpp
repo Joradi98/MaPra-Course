@@ -413,6 +413,11 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
             VertexT neighbor = neighbors[i].first;
             // if neighbor in closedSet
             if ( std::find(closedVertices.begin(), closedVertices.end(), neighbor) != closedVertices.end()  ) {
+                
+                
+                
+                
+                
                 continue;
             }
             // if neighbor not in openSet	// Discover a new node
@@ -421,7 +426,7 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
             }
             
             
-            double tentative_gScore = gScore.at(current) + g.estimatedCost(current, neighbor);
+            double tentative_gScore = gScore.at(current) + g.cost(current, neighbor);
             
             if (tentative_gScore >= gScore.at(neighbor) ) {
                 continue;
