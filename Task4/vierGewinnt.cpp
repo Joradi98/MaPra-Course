@@ -8,7 +8,7 @@
 void NetzwerkMain();
 
 
-const unsigned int Schwierigkeitsgrad = 4;
+const unsigned int Schwierigkeitsgrad = 6;
 
 
 void outputGameField(Spielbrett gameField){
