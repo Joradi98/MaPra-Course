@@ -166,9 +166,10 @@ bool A_star(const DistanceGraph& g, GraphVisualizer& v, VertexT start, VertexT z
     int COST = 1;
     std::vector<VertexT> seenNodes;
     std::vector<VertexT> exploredNodes;
-    VertexComparator comparator = VertexComparator(ziel, g);
+    //VertexComparator comparator = VertexComparator(ziel, g);
     seenNodes.push_back(start);
-    std::make_heap(seenNodes, VertexComparator());
+    std::make_heap(seenNodes, VertexComparator(ziel, g));
+    std::map<VertexT, VertexT> predecessors; // maps nodes to it's predecessors
     for(unsigned int i = 0; i < g.numVertices(); i++){
         comparator.gValues.push_back(infty);
     }
@@ -176,13 +177,22 @@ bool A_star(const DistanceGraph& g, GraphVisualizer& v, VertexT start, VertexT z
         VertexT minfVertex = seenNodes.front();
         exploredNodes.push_back(minfVertex);
         if(minfVertex == ziel){
-            // todo: reconstruct path
+            VertexT current = minfVertex;
+            while(1){
+                if(predecessors.count(minfVertex) == 0){
+                    // this is the begin of the path
+                    break;
+                }
+                weg.push_front(minfVertex);
+                current = predecessors[current];
+            } 
             return true;
         }
-        std::pop_heap(seenNodes.begin(), seenNodes.end(), VertexComparator());
+        std::pop_heap(seenNodes.begin(), seenNodes.end(), VertexComparator(ziel, g));
         seenNodes.pop_back();
         std::vector<std::pair<VectorT, CostT>> neighbors = g.getNeighbors(minfVertex);
         for(int i = 0; i < neighbors.size(); i++){
+            // check if node is not a wall...// check if node is not a wall.....
             if(exploredNodes.find(exploredNodes.begin(), exploredNodes.end(), neighbors[i][0]) == exploredNodes.end()){
                 if(seenNodes.find(seenNodes.begin(), seenNodes.end(), neighbors[i][0] == seenNodes.end()){
                     seenNodes.push_back(neighbors[i][0]);
@@ -191,6 +201,7 @@ bool A_star(const DistanceGraph& g, GraphVisualizer& v, VertexT start, VertexT z
                 else {
                     comparator.gValues[neighbors[i][0]] = comparator.gValues[minfVertex] + COST;  
                 }
+                predecessors[neighbors[i][0]] = minfVertex;
             }
         }          
     }
@@ -236,7 +247,20 @@ int main()
         std::cout << "error reading file.";
     }
     // PruefeHeuristik
-
+    
+    std::cout << "enter [5 - 8] >> ";
+    std::cin >> example;
+    std::ifstream file2;
+    file.open("daten/Maze" + std::to_string(example) + ".dat");
+    if(file.is_open()){
+        int sizex = 0;
+        int sizey = 0;
+        file >> sizex;
+        file >> sizey;
+        // read maze...
+        // check A* algorithm..
+    } 
+    
     // Loese die in der Aufgabenstellung beschriebenen Probleme fuer die jeweilige Datei
     // PruefeDijkstra / PruefeWeg
 
