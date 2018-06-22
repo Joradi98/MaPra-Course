@@ -421,7 +421,7 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
             }
             
             
-            double tentative_gScore = gScore.at(current) + g.estimatedCost(current, neighbor);
+            double tentative_gScore = gScore.at(current) + g.cost(current, neighbor);
             
             if (tentative_gScore >= gScore.at(neighbor) ) {
                 continue;
