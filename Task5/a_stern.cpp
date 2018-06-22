@@ -350,6 +350,7 @@ struct Comparator {
 //bool A_star(DistanceGraph& g, GraphVisualizer& v, VertexT start, VertexT ziel, std::list<VertexT>& weg) {
 std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
     std::cout << "Soll Weg finden von " << start << " nach " << ziel << std::endl;
+    std::cout << "Insgesamt " << g.numVertices() << " Knoten." << std::endl;
 
     std::list<VertexT> weg;
 
@@ -370,6 +371,7 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
 
     }
     
+    
     CompararingInstance startElement = CompararingInstance(start, ziel, &g, &gValues); //Construct starting element
 
     openElements.push_back(startElement); //Enquere starting element
@@ -387,10 +389,11 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
         exploredVertices.insert(minfElement.vertex);
         
         if ( minfElement.vertex == ziel ) {
+            std::cout << "yoyo";
             CompararingInstance vorher = minfElement;
             weg.push_back(ziel);
             while ( vorher.vorgaenger >= 0 ) {
-                std::cout << vorher.vertex << std::endl ;
+                //std::cout << vorher.vertex << std::endl ;
                 vorher = exploredElements.at(vorher.vorgaenger);
                 weg.push_back(vorher.vertex);
             }
@@ -436,7 +439,7 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
 
     }
     
-  
+    std::cout << "A* finished without finding a way" << std::endl;
     return weg;
 }
 
@@ -483,9 +486,42 @@ void processDistance(int example) {
 void processMaze(int example) {
     std::ifstream file;
 
-    if (example <= 5) {
+    if (example <= 9) {
         //load maze
-        file.open("daten/Maze" + std::to_string(example) + ".dat");
+        file.open("daten/Maze" + std::to_string(example-4) + ".dat");
+        int breite;
+        int hoehe;
+        file >> breite;
+        file >> hoehe;
+        std::cout << breite << " und " << hoehe << std::endl;
+        std::vector<CellType> mazeData;
+        for(int i = 0; i < breite*hoehe; i++){
+            char symbol;
+            file >> symbol;
+            //std::cout << "Read Symbol: " << symbol << std::endl;
+            if (symbol == '.') {
+                mazeData.push_back(CellType::Ground);
+            } else if (symbol == '#') {
+                mazeData.push_back(CellType::Wall);
+            }
+        }
+        MazeGraph graph = MazeGraph(mazeData,breite,example);
+        PruefeHeuristik(graph);
+        for ( auto pair : StartZielPaare(example)) {
+            auto start = pair.first;
+            auto goal  = pair.second;
+            std::list<VertexT> weg = A_star(graph, start, goal );
+            PruefeWeg(example, weg);
+        }
+
+
+
+        
+        
+        
+        
+        
+        
     } else {
         //generate maze
         srand(time(NULL));
@@ -511,7 +547,7 @@ int main()
     if (example <= 4 ) {
         processDistance(example);
     } else if (example <= 10) {
-        processMaze(example-4);
+        processMaze(example);
     } else {
         std::cout << "error reading file.";
     }
