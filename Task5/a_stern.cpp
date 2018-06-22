@@ -107,12 +107,11 @@ public:
             return getDist(firstCoordinate.first, firstCoordinate.second, secondCoordinate.first, secondCoordinate.second);            
         } else if (example == 3) {
             return sqrt( xDifference*xDifference + yDifference*yDifference);
-        } else if (example == 4) {
-            return sqrt( xDifference*xDifference + yDifference*yDifference);
-
+        } else {
+            return 0;
         }
         
-        return 42;
+        return 0;
     }
 
 };
@@ -120,14 +119,14 @@ public:
 
 class MazeGraph : public CoordinateGraph {
 
-private:
-    std::vector<std::pair<double, double>> coordinatesFromMazeData(std::vector<CellType> mazeData, int breite) {
+public:
+    static std::vector<std::pair<double, double>> coordinatesFromMazeData(std::vector<CellType> mazeData, int breite) {
         std::vector<std::pair<double, double>> coordinates;
         
         int hoehe = (int)mazeData.size() / breite;
         
-        for ( int b = 0; b < breite; b++) {
-            for ( int h = 0; h < hoehe; h++) {
+        for ( int h = 0; h < hoehe; h++) {
+            for ( int b = 0; b < breite; b++) {
                 std::pair<double, double> coordinate = std::make_pair(b, h);
                 coordinates.push_back(coordinate);
             }
@@ -136,9 +135,9 @@ private:
     }
     
     
-    std::vector<std::pair<int, int>> validNeighbours(std::vector<CellType> mazeData, std::pair<int, int> currentTile, int breite) {
+   static std::vector<std::pair<int, int>> validNeighbours(std::vector<CellType> mazeData, std::pair<int, int> currentTile, int breite) {
         std::vector<std::pair<int, int>> valid;
-        
+
         int b = currentTile.first;
         int h = currentTile.second;
         int hoehe = mazeData.size() / breite;
@@ -165,12 +164,14 @@ private:
         }
         
         neighbour = b + (h+1)*breite;
+
         if (neighbour > 0 && h+1 < hoehe && neighbour < size) {
             switch (mazeData[neighbour]) { ///Nicht nach unten rausfallen
             	case CellType::Wall:
                     break;
                 default:
                     valid.push_back(std::make_pair(b, h+1));
+
             }
         }
         
@@ -188,9 +189,9 @@ private:
 
     }    
     
-    std::vector<std::pair<EdgeT, CostT>> costsFromMazeData(std::vector<CellType> mazeData, int breite)  {
+    static std::vector<std::pair<EdgeT, CostT>> edgeDataFromMazeData(std::vector<CellType> mazeData, int breite)  {
         std::vector<std::pair<EdgeT, CostT>> edgeData; //Edgedata contains a list of edges and their costs
-        
+
         int hoehe = mazeData.size()/breite;
         for ( int b = 0; b < breite; b++) {
             for ( int h = 0; h < hoehe; h++) {
@@ -199,7 +200,6 @@ private:
                 	case CellType::Wall: 
                         break;
                     default: //Passable tile
-                        break;
                         //Schaue all moeglichen Nachbarn an, d.h. solche die passierbar sind
                         std::vector<std::pair<int, int>> valids = validNeighbours(mazeData,std::make_pair(b, h), breite);
                         for (unsigned int k = 0; k < valids.size(); k++) {
@@ -208,6 +208,7 @@ private:
                             EdgeT edge = std::make_pair(myVertexNumber, neighbourVertexNumber);
                             edgeData.push_back( std::make_pair(edge, 1) ); //Cost is always 1
                         }
+                        break;
                 }
             }
         }
@@ -216,20 +217,48 @@ private:
         return edgeData;
     }
 
-public:
+    void findStartAndEnd (std::vector<CellType> mazeData, int breite) {
+        int hoehe = (int)mazeData.size() / breite;
 
+        for ( int b = 0; b < breite; b++) {
+            for ( int h = 0; h < hoehe; h++) {
+                switch (mazeData[b+h*breite]) {
+                	case CellType::Start:
+                        this->start = b+h*breite;
+                        break;
+                    case CellType::Destination:
+                        this->end = b+h*breite;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    
+
+public:
+    
+    VertexT start;
+    VertexT end;
+    
     //Creates a maze where each tile is a vetex, nomatter if its passable or not. 
     //Costs are 1 is poassable and 0 if not.
-    MazeGraph(std::vector<CellType> mazeData, int breite, int example) : CoordinateGraph(mazeData.size(), coordinatesFromMazeData(mazeData, breite), costsFromMazeData(mazeData, breite), example) {}
+    MazeGraph(std::vector<CellType> mazeData, int breite, int example) : CoordinateGraph(mazeData.size(), coordinatesFromMazeData(mazeData, breite), edgeDataFromMazeData(mazeData, breite), example) {
+        findStartAndEnd(mazeData, breite);
+
+        
+    }
     
     CostT estimatedCost(VertexT from, VertexT to) const {
-        // todo implement heuristic
+
         std::pair<double, double> firstCoordinate = coordinates.at(from);
         std::pair<double, double> secondCoordinate = coordinates.at(to);
 
         double xDifference = (firstCoordinate.first-secondCoordinate.first);
         double yDifference = (firstCoordinate.second-secondCoordinate.second);
-
+    //std::cout << firstCoordinate.second << secondCoordinate.second << std::endl;
         return  fabs(xDifference) + fabs(yDifference);
     }
 };
@@ -308,7 +337,6 @@ struct CompararingInstance {
 
     }
     
-   // double f;
 };
 
 struct Comparator {
@@ -333,8 +361,7 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
 
 
     std::vector<VertexT> gValues;
-
-    for(unsigned int i = 1; i < g.numVertices(); i++){
+    for(unsigned int i = 0; i < g.numVertices(); i++){
         if (i == start ) {
             gValues.push_back(0);
         } else {
@@ -353,27 +380,21 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
     while ( !openElements.empty() ) {
         std::pop_heap(openElements.begin(), openElements.end(), Comparator()); //Moves highest element to the end
         CompararingInstance minfElement = openElements.back();
-        openElements.pop_back();      //Pops last element
-
         
+        
+        openElements.pop_back();      //Pops last element
         exploredElements.push_back(minfElement);
         exploredVertices.insert(minfElement.vertex);
         
         if ( minfElement.vertex == ziel ) {
-            // todo: reconstruct path
             CompararingInstance vorher = minfElement;
             weg.push_back(ziel);
             while ( vorher.vorgaenger >= 0 ) {
                 std::cout << vorher.vertex << std::endl ;
                 vorher = exploredElements.at(vorher.vorgaenger);
                 weg.push_back(vorher.vertex);
-
-//                if (vorher.vertex == start) {  break; }
-                //std::cout << " hat vorgaegner: " << vorher.vertex << std::endl;
-              //  std::getchar();
             }
             weg.reverse();
-          //  std::cout << " hat vorgaegner: " << minfElement.vorgaenger->vertex << std::endl;
             return weg;
         }
         
@@ -383,20 +404,23 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
         // - ein besserer Weg zu diesem Knoten gefunden wird        
         std::vector<std::pair<VertexT, CostT>> neighbors = g.getNeighbors(minfElement.vertex);
         for(unsigned int i = 0; i < neighbors.size(); i++){
+           // std::cout << "Neighbour:" << std::endl;
+            //std::cout << neighbors[i].first << std::endl;
             //CompararingInstance(neighbors[i].first, ziel, &g,&gValues);
             CompararingInstance neighbourElement = CompararingInstance(neighbors[i].first, ziel, &g,&gValues); //Construct neighbour element
             if(exploredVertices.find(neighbourElement.vertex) != exploredVertices.end() ){ 
                 continue;
-            }   
-        
+            }     
             double tentative_g = gValues[minfElement.vertex] + g.cost(minfElement.vertex, neighbourElement.vertex);  
             
+
+            //Alternative 2
             if(openVertices.find(neighbourElement.vertex) != openVertices.end()  && tentative_g >= gValues[neighbourElement.vertex]  ){
                 continue;
             }
-        
+
             neighbourElement.vorgaenger = exploredElements.size()-1 ;
-           // std::cout << "Setze Weg von " << minfElement.vertex << " nach " << neighbourElement.vertex << std::endl;
+            // std::cout << "Setze Weg von " << minfElement.vertex << " nach " << neighbourElement.vertex << std::endl;
             gValues[neighbourElement.vertex] = tentative_g;
                         
             if(openVertices.find(neighbourElement.vertex) != openVertices.end() ){
@@ -407,7 +431,6 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
                 openVertices.insert(neighbourElement.vertex);
                 std::push_heap(openElements.begin(), openElements.end(),Comparator()); 
             }
-   
             
         }         
 
@@ -417,11 +440,8 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
     return weg;
 }
 
-int main()
-{
-    int example = 0;
-    std::cout << "enter [1-4] >> ";
-    std::cin >> example;
+
+void processDistance(int example) {
     std::ifstream file;
     file.open("daten/Graph" + std::to_string(example) + ".dat");
     if(file.is_open()){
@@ -456,19 +476,47 @@ int main()
             }
             
         }
+    }
 
-        
+}
+
+void processMaze(int example) {
+    std::ifstream file;
+
+    if (example <= 5) {
+        //load maze
+        file.open("daten/Maze" + std::to_string(example) + ".dat");
+    } else {
+        //generate maze
+        srand(time(NULL));
+        int seed = rand();
+        std::cout << "Using seed " << seed << std::endl;
+        std::vector<CellType> mazeData = ErzeugeLabyrinth(5, 10 , seed);
+        MazeGraph graph = MazeGraph(mazeData,5,10);
+         
+        PruefeHeuristik(graph);
+        std::list<VertexT> weg = A_star(graph, graph.start, graph.end);
+        PruefeWeg(10, weg);
 
     }
-    else {
+
+}
+
+
+int main()
+{
+    int example = 0;
+    std::cout << "enter [1-10] >> ";
+    std::cin >> example;
+    if (example <= 4 ) {
+        processDistance(example);
+    } else if (example <= 10) {
+        processMaze(example-4);
+    } else {
         std::cout << "error reading file.";
     }
     
     
-   // std::vector<CellType> mazeData = ErzeugeLabyrinth(5, 10, 23453);
-   // MazeGraph graph = MazeGraph(mazeData,5);
-    
-    // PruefeHeuristik
 
 
     return 0;
