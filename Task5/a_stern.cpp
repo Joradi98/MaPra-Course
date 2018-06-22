@@ -104,9 +104,11 @@ public:
             return sqrt( xDifference*xDifference + yDifference*yDifference);
 
         } else if (example == 2) {
-            return getDist(firstCoordinate.first, firstCoordinate.second, secondCoordinate.first, secondCoordinate.second);            
+          return 0;
         } else if (example == 3) {
             return sqrt( xDifference*xDifference + yDifference*yDifference);
+        } else if (example == 4){
+            return getDist(firstCoordinate.first, firstCoordinate.second, secondCoordinate.first, secondCoordinate.second) * 1.0 / 200.0; // 200kmh
         } else {
             return 0;
         }
@@ -413,11 +415,6 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
             VertexT neighbor = neighbors[i].first;
             // if neighbor in closedSet
             if ( std::find(closedVertices.begin(), closedVertices.end(), neighbor) != closedVertices.end()  ) {
-                
-                
-                
-                
-                
                 continue;
             }
             // if neighbor not in openSet	// Discover a new node
@@ -441,9 +438,7 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
     }
 
 
-
-    
-    std::cout << "A* finished without finding a way" << std::endl;
+    //std::cout << "A* finished without finding a way" << std::endl;
     return weg;
 }
 
@@ -485,7 +480,7 @@ void processDistance(int example) {
                 }
             }
             
-        }
+       }
     }
 
 }
