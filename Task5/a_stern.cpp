@@ -349,8 +349,8 @@ struct Comparator {
 
 //bool A_star(DistanceGraph& g, GraphVisualizer& v, VertexT start, VertexT ziel, std::list<VertexT>& weg) {
 std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
-    std::cout << "Soll Weg finden von " << start << " nach " << ziel << std::endl;
-    std::cout << "Insgesamt " << g.numVertices() << " Knoten." << std::endl;
+   // std::cout << "Soll Weg finden von " << start << " nach " << ziel << std::endl;
+   // std::cout << "Insgesamt " << g.numVertices() << " Knoten." << std::endl;
 
     std::list<VertexT> weg;
 
@@ -389,7 +389,6 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
         exploredVertices.insert(minfElement.vertex);
         
         if ( minfElement.vertex == ziel ) {
-            std::cout << "yoyo";
             CompararingInstance vorher = minfElement;
             weg.push_back(ziel);
             while ( vorher.vorgaenger >= 0 ) {
@@ -416,7 +415,24 @@ std::list<VertexT> A_star(DistanceGraph& g, VertexT start, VertexT ziel) {
             }     
             double tentative_g = gValues[minfElement.vertex] + g.cost(minfElement.vertex, neighbourElement.vertex);  
             
+            // Alternative 1
+           /* if (openVertices.find(neighbourElement.vertex) == openVertices.end()) {
+                openElements.push_back(neighbourElement);
+                openVertices.insert(neighbourElement.vertex);
+            }
 
+            if ( tentative_g >= gValues[neighbourElement.vertex] ) {
+                std::cout << "lame" << std::endl;
+                continue;
+            }
+            
+            neighbourElement.vorgaenger = exploredElements.size()-1 ;
+            // std::cout << "Setze Weg von " << minfElement.vertex << " nach " << neighbourElement.vertex << std::endl;
+            gValues[neighbourElement.vertex] = tentative_g;
+            std::make_heap(openElements.begin(),openElements.end(), Comparator() );*/ //Make heap again to update f value                
+
+            
+            
             //Alternative 2
             if(openVertices.find(neighbourElement.vertex) != openVertices.end()  && tentative_g >= gValues[neighbourElement.vertex]  ){
                 continue;
@@ -470,12 +486,15 @@ void processDistance(int example) {
       
         for(VertexT i = 0; i < graph.numVertices(); i++){
             std::vector<CostT> costs;
-           // Dijkstra(graph, i, costs); //Start Dijkstra from each vertex
-           // PruefeDijkstra(example, i, costs);
+            Dijkstra(graph, i, costs); //Start Dijkstra from each vertex
+            PruefeDijkstra(example, i, costs);
             std::getchar();
-            std::list<VertexT> weg = A_star(graph, 0, i);
-            if (weg.size() > 1) {
-                PruefeWeg(example, weg);
+            //Find every combination with A*
+            for (VertexT j = 0; j < graph.numVertices();j++) {
+                std::list<VertexT> weg = A_star(graph, i, j);
+                if (weg.size() > 1) {
+                    PruefeWeg(example, weg);
+                }
             }
             
         }
@@ -514,13 +533,6 @@ void processMaze(int example) {
             PruefeWeg(example, weg);
         }
 
-
-
-        
-        
-        
-        
-        
         
     } else {
         //generate maze
