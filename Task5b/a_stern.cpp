@@ -8,6 +8,8 @@
 #include "BasicStaticGraph.h"
 #include "CoordinateGraph.h"
 #include "MazeGraph.h"
+#include "MazeVisualizer.cpp"
+#include <SFML/Graphics.hpp>
 
 /** Dijkastra Algorithm 
 * Solves the Single-Source Shortest Path Problem with non-negative edge weights
@@ -279,8 +281,8 @@ void processMaze(int example) {
                 mazeData.push_back(CellType::Wall);
             }
         }
-        MazeGraph graph = MazeGraph(mazeData,breite,example);    //Maze from file
-        TextVisualizer visualizer = TextVisualizer();           
+        MazeGraph graph(mazeData,breite,example);    //Maze from file
+        MazeVisualizer visualizer(1000,1000,graph);
         PruefeHeuristik(graph);
         
         for ( auto pair : StartZielPaare(example)) {            //Find shortest path solving the maze
@@ -289,20 +291,25 @@ void processMaze(int example) {
             std::list<VertexT> weg = A_star(graph, visualizer, start, goal );
             PruefeWeg(example, weg);
         }
-        
+        visualizer.keepRunning();
+
     } else {
         //generate random maze
         srand(time(NULL));
         int seed = rand();
         std::cout << "Using seed " << seed << std::endl;
         std::vector<CellType> mazeData = ErzeugeLabyrinth(5, 10 , seed);
-        MazeGraph graph = MazeGraph(mazeData,5,10);              //Randomly generated maze
-        TextVisualizer visualizer = TextVisualizer();            
+        MazeGraph graph(mazeData,5,10);              //Randomly generated maze
+        MazeVisualizer visualizer(1000,1000,graph);
 
         PruefeHeuristik(graph);
         std::list<VertexT> weg = A_star(graph, visualizer, graph.start, graph.end); //Find shortest path solving the maze
         PruefeWeg(10, weg);
+        visualizer.keepRunning();
     }
+    
+
+    
 }
 
 

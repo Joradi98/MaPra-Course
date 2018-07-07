@@ -1,6 +1,12 @@
 #include <iostream>
 #include "unit.h"
 
+
+#ifndef MAZEGRAPH_H
+#define MAZEGRAPH_H
+
+
+
 /** MazeGraph
 A graph representing a maze.
 Each vertex can be either start/finish, waklable or a wall
@@ -128,18 +134,26 @@ private:
 	}
 
 	
-
+private:
+    std::vector<CellType> cellData;
+    
 public:
 	
 	//MARK: Interface
-	
 	VertexT start;
 	VertexT end;
 	
+    int width; //Number of tiles in a row
+    int height;//Number of tiles in a line
+    
 	//Creates a maze where each tile is a vetex, nomatter if its passable or not. 
 	//Costs are 1 is poassable and 0 if not.
 	MazeGraph(std::vector<CellType> mazeData, int breite, int example) : CoordinateGraph(mazeData.size(), coordinatesFromMazeData(mazeData, breite), edgeDataFromMazeData(mazeData, breite), example) {
 		findStartAndEnd(mazeData, breite);
+        
+        width = breite;
+        height = mazeData.size() / breite;
+        cellData = mazeData;
 	}
 	
 	//Manhatten Distance
@@ -152,5 +166,14 @@ public:
 		double yDifference = (firstCoordinate.second-secondCoordinate.second);
 		return  fabs(xDifference) + fabs(yDifference);
 	}
+    
+    
+    CellType typeOfCell(VertexT vertex) {
+        return cellData[vertex];
+    }
+    
 };
+
+
+#endif
 

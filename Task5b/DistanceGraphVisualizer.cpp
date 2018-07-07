@@ -18,38 +18,25 @@ class DistanceGraphVisualizer : public GraphVisualizer
 {
   public:
     
+    //init with adaptive screensize
     
+    //Convert long/lat coordinates to coordinates within the plane
+    
+    //hold reference to graoh and costs, and whatever
+    
+    //implement draw() method
+    
+
     
     void markVertex(VertexT vertex, VertexStatus status) override {
-        static const char* TEXT[] = {
-            "Unbekannt", "In Queue", "Aktiv", "Fertig", "Ziel"
-        };
-        
-        std::cerr << "VERTEX " << vertex << " - Neuer Status: " << TEXT[static_cast<int>(status)]  << '\n';
+
     }
     
     void markEdge(EdgeT e, EdgeStatus status) override {
-        static const char* TEXT[] = {
-            " - Unbekannt", " - Besucht", " - Aktiv", " - Optimal"
-        };
-        
-        std::cerr << "KANTE  (" << e.first << ", " << e.second << ")" << TEXT[static_cast<int>(status)]  << '\n';
+
     }
     
     void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status) override {
-        static const char* TEXT[] = {
-            " - Unbekannt", " - In Queue", " - Aktiv", " - Fertig", " - Ziel"
-        };
-        
-        
-        std::cerr << "VERTEX " << vertex << TEXT[static_cast<int>(status)]  << ", Vaterknoten ";
-        
-        if (parent != undefinedVertex) {
-            std::cerr << parent;
-        } else {
-            std::cerr << '?';
-        }
-        
-        std::cerr << ", Kosten " << (cost+estimate) << " = " << cost << "+" << estimate << '\n';
+
     }
 };
