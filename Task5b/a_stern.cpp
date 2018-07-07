@@ -100,7 +100,7 @@ std::list<VertexT> A_star(DistanceGraph& g, GraphVisualizer& v, VertexT start, V
 
     //MARK all vertices, update current g and f scores
     for (VertexT i = 0; i < g.numVertices(); i++) {
-        v.updateVertex(i, gScore[i], fScore[i]-gScore[i], 0, VertexStatus::UnknownVertex); //the second last argument is described as "VertexT parent" in unit.h . This is totally irrelevant and nonsense for us, so just pass 0 to it.
+     //   v.updateVertex(i, gScore[i], fScore[i]-gScore[i], 0, VertexStatus::UnknownVertex); //the second last argument is described as "VertexT parent" in unit.h . This is totally irrelevant and nonsense for us, so just pass 0 to it.
         
         //MARK all edges with their costs (will only be applicable to CoordinateGraphs, mazes dont need that shit)
         std::vector<std::pair<VertexT, CostT>> neighbors = g.getNeighbors(i);

@@ -21,7 +21,8 @@ private:
     MazeGraph graph;
     std::vector<VertexInformation> vertices;    /// Drawable information for each vertex
     std::vector<EdgeT> markedEdges;             /// Edges that should be highlighted (i.e. the successfull path at the end)
-    
+    sf::Font font;
+
 public:
 
     /**
@@ -35,9 +36,14 @@ public:
             vertices[i].gValue = 0.0;
             vertices[i].hValue = 0.0;
         }
-        draw();
-
         
+        if (!font.loadFromFile("font/BebasNeue-Regular.ttf")) {
+            std::cout << "Error on loading font!" << std::endl;
+        }
+        
+        
+        
+        draw();
     }
 
 
@@ -139,6 +145,12 @@ private:
     void drawVertices() {
         //Create a rectangle for each node
         sf::RectangleShape shape;
+        //Text for gValue and hValue
+        sf::Text text;
+        text.setFont(font);
+
+        
+        
         double singleWidth = window.getSize().x/graph.width;
         double singleHeight = window.getSize().y/graph.height;
         
@@ -149,13 +161,13 @@ private:
                 
                 //Place it at the correct point. (Counting from upper left to lwer right?)
                 shape.setOrigin(0, 0);
-                shape.setPosition(singleWidth*j,singleHeight*i); // positioning the circle 200 units right from the top left corner
+                shape.setPosition(singleWidth*j,singleHeight*i);
 
                 //Distinguish (wall vs ground)
                 if (graph.typeOfCell(vertexIndex) == CellType::Wall ) {
                     shape.setFillColor(sf::Color(0, 0, 0));         //Walls: Black
                 } else {
-               //     std::cout << vertices.size() << std::endl;
+
                     //Distinguish VertexStatus (UknownVertex vs Active vs Done etc)
                     switch ( vertices[vertexIndex].status ) {
                         case VertexStatus::Destination:
@@ -179,8 +191,25 @@ private:
                     }
                 }
                 
-                
                 window.draw(shape);
+                
+                //Draw text AFTERWARDS
+                if ( graph.typeOfCell(vertexIndex) != CellType::Wall ) {
+                    
+                    // set the string to display
+                    text.setString(std::to_string(vertices[vertexIndex].gValue) + "\n" + std::to_string(vertices[vertexIndex].hValue));
+                    // set the character size
+                    text.setCharacterSize(12); // in pixels, not points!
+                    text.setOrigin(0, 0);
+                    // std::cout << singleWidth << std::endl;
+                    text.setPosition(j*singleWidth,singleHeight*i);
+                    // set the colors
+                    text.setFillColor(sf::Color::Red);
+                    window.draw(text);
+
+                }
+                
+                
             }
         }
 
