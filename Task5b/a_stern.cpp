@@ -93,10 +93,28 @@ std::list<VertexT> A_star(DistanceGraph& g, GraphVisualizer& v, VertexT start, V
         } else {
             fScore[i] = infty;
         }
+
     }
 
-    openVertices.push_back(start);
+    //MARK all vertices, update current g and f scores
+    for (VertexT i = 0; i < g.numVertices(); i++) {
+        v.updateVertex(i, gScore[i], fScore[i]-gScore[i], 0, VertexStatus::UnknownVertex); //the second last argument is described as "VertexT parent" in unit.h . This is totally irrelevant and nonsense for us, so just pass 0 to it.
+        
+        //MARK all edges with their costs (will only be applicable to CoordinateGraphs, mazes dont need that shit)
+        std::vector<std::pair<VertexT, CostT>> neighbors = g.getNeighbors(i);
+        for(unsigned int k = 0; i < neighbors.size(); i++){
+            v.markEdge(EdgeT(i, neighbors[k].first), EdgeStatus::UnknownEdge );
+        }
+    }
+    //MARK destination
+    v.markVertex(ziel, VertexStatus::Destination);
+
     
+    
+    openVertices.push_back(start);
+    //MARK node in queue
+    v.markVertex(start, VertexStatus::InQueue);
+
     while (!openVertices.empty()) {
         VertexT current = openVertices.back();
         // Get the node in openSet having the lowest fScore[] value
@@ -104,18 +122,32 @@ std::list<VertexT> A_star(DistanceGraph& g, GraphVisualizer& v, VertexT start, V
             VertexT instance = openVertices.at(i);
             if (fScore.at(instance) < fScore.at(current) ){
                 current = instance;
+                
             }
         }
+        //MARK currently active node
+        v.markVertex(current, VertexStatus::Active);
+
         
         if ( current == ziel ) {
-            VertexT vorher = ziel;
-            weg.push_back(vorher);
-            while ( cameFrom.count(vorher) > 0 ) {
-               // std::cout << "Count: " << cameFrom.count(vorher) << std::endl;
-                vorher = cameFrom.at(vorher);
+            VertexT nachher = ziel;
+            VertexT vorher;
+            weg.push_back(ziel);
+            while ( cameFrom.count(nachher) > 0 ) {
+                //Calculate vertex from which the goal was reached
+                vorher = cameFrom.at(nachher);
+
+                //MARK optimal edge
+                v.markEdge(EdgeT(vorher, nachher), EdgeStatus::Optimal );
+
+                //Update for next iteration
+                nachher = vorher;
                 weg.push_back(vorher);
+                
             }
+            //Reverse the path
             weg.reverse();
+            
             return weg;
         }
         
@@ -125,27 +157,48 @@ std::list<VertexT> A_star(DistanceGraph& g, GraphVisualizer& v, VertexT start, V
         std::vector<std::pair<VertexT, CostT>> neighbors = g.getNeighbors(current);
         for(unsigned int i = 0; i < neighbors.size(); i++){
             VertexT neighbor = neighbors[i].first;
+            
             // if neighbor in closedSet
             if ( std::find(closedVertices.begin(), closedVertices.end(), neighbor) != closedVertices.end()  ) {
                 continue;
             }
+            
+            //MARK Currently considered edge
+            v.markEdge(EdgeT(current, neighbor), EdgeStatus::Active );
+            
             // if neighbor not in openSet	// Discover a new node
             if ( std::find(openVertices.begin(), openVertices.end(), neighbor) == openVertices.end()  ) {
                 openVertices.push_back(neighbor);
+                //MARK neighbour as inQueue
+                v.markVertex(neighbor, VertexStatus::InQueue);
+
             }
             
             
             double tentative_gScore = gScore.at(current) + g.cost(current, neighbor);
             
+
+            //MARK Visited edge
+            v.markEdge(EdgeT(current, neighbor), EdgeStatus::Visited );
+
             if (tentative_gScore >= gScore.at(neighbor) ) {
                 continue;
+            } else {
+                cameFrom[neighbor] = current;
+                gScore[neighbor] = tentative_gScore;
+                fScore[neighbor] = gScore[neighbor] + g.estimatedCost(neighbor, ziel);
+                
+                //MARK gScore, hScore
+                v.updateVertex(neighbor, gScore[neighbor], fScore[neighbor]-gScore[neighbor], 0, VertexStatus::InQueue); //the second last argument is described as "VertexT parent" in unit.h . This is totally irrelevant and nonsense for us, so just pass 0 to it.
+
             }
             
-            cameFrom[neighbor] = current;
-            gScore[neighbor] = tentative_gScore;
-            fScore[neighbor] = gScore[neighbor] + g.estimatedCost(neighbor, ziel);
-            
         }
+        
+        //MARK node as done
+        v.markVertex(current, VertexStatus::Done);
+
+        
         
     }
 
