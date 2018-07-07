@@ -11,6 +11,7 @@
 #include "MazeVisualizer.cpp"
 #include <SFML/Graphics.hpp>
 
+
 /** Dijkastra Algorithm 
 * Solves the Single-Source Shortest Path Problem with non-negative edge weights
 */
@@ -257,7 +258,7 @@ void processDistance(int example) {
 
 
 /**
-* Workflow for example being in [5,10] and thus a maze should be constructed
+* Workflow for example being in [10,10] and thus a maze should be constructed
 */
 void processMaze(int example) {
     std::ifstream file;
@@ -298,8 +299,8 @@ void processMaze(int example) {
         srand(time(NULL));
         int seed = rand();
         std::cout << "Using seed " << seed << std::endl;
-        std::vector<CellType> mazeData = ErzeugeLabyrinth(5, 10 , seed);
-        MazeGraph graph(mazeData,5,10);              //Randomly generated maze
+        std::vector<CellType> mazeData = ErzeugeLabyrinth(10, 10 , seed);
+        MazeGraph graph(mazeData,10,10);              //Randomly generated maze
         MazeVisualizer visualizer(1000,1000,graph);
 
         PruefeHeuristik(graph);

@@ -6,6 +6,8 @@
 #include "MazeGraph.h"
 #include <SFML/Graphics.hpp>
 
+#define SHOULD_DISPLAY_TEXT 0
+
 ///A struct storing information relevant for drawing a vertex
 struct VertexInformation {
     VertexStatus status;
@@ -194,7 +196,7 @@ private:
                 window.draw(shape);
                 
                 //Draw text AFTERWARDS
-                if ( graph.typeOfCell(vertexIndex) != CellType::Wall ) {
+                if ( graph.typeOfCell(vertexIndex) != CellType::Wall && SHOULD_DISPLAY_TEXT) {
                     
                     // set the string to display
                     text.setString(std::to_string(vertices[vertexIndex].gValue) + "\n" + std::to_string(vertices[vertexIndex].hValue));
