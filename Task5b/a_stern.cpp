@@ -9,6 +9,7 @@
 #include "CoordinateGraph.h"
 #include "MazeGraph.h"
 #include "MazeVisualizer.cpp"
+#include "CoordinateGraphVisualizer.cpp"
 #include <SFML/Graphics.hpp>
 
 
@@ -236,21 +237,29 @@ void processDistance(int example) {
             coordinateData.push_back(std::pair<double, double>(x, y));
         }
         CoordinateGraph graph = CoordinateGraph(numVertices, coordinateData, graphData, example); //CoordinateGraph constructed from file
-        TextVisualizer visualizer = TextVisualizer();
+       
+        CoordinateGraphVisualizer *visualizer;
+        if (example == 3) { //Europa
+            visualizer = new CoordinateGraphVisualizer(1300,800,graph);
+        } else {
+            visualizer = new CoordinateGraphVisualizer(700,800,graph);
+        }
+        
         PruefeHeuristik(graph);
-      
+
         for(VertexT i = 0; i < graph.numVertices(); i++){                //Apply Dijksstra to each vertex
             std::vector<CostT> costs;
             Dijkstra(graph, i, costs); //Start Dijkstra from each vertex
-            PruefeDijkstra(example, i, costs);
-            std::getchar();
+            //PruefeDijkstra(example, i, costs);
+           // std::getchar();
             //Find every combination with A*
             for (VertexT j = 0; j < graph.numVertices();j++) {            //Apply A* to all combinations of start and ending vertices
-                std::list<VertexT> weg = A_star(graph, visualizer,i, j);
+                std::list<VertexT> weg = A_star(graph, *visualizer,i, j);
                 if (weg.size() > 1) {
-                    PruefeWeg(example, weg);
+                  //  PruefeWeg(example, weg);
                 }
             }
+            visualizer->keepRunning();
        }
     }
 

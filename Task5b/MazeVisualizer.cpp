@@ -1,19 +1,11 @@
 #pragma once
-
-
 #include "unit.h"
 #include <iostream>
 #include "MazeGraph.h"
+#include "VisualizationUtilities.h"
 #include <SFML/Graphics.hpp>
 
 #define SHOULD_DISPLAY_TEXT 0
-
-///A struct storing information relevant for drawing a vertex
-struct VertexInformation {
-    VertexStatus status;
-    double gValue;
-    double hValue;
-};
 
 
 class MazeVisualizer : public GraphVisualizer
@@ -74,7 +66,7 @@ public:
     //implement draw() method
      void draw() {
          //reset to black
-         //window.clear(sf::Color::Black);
+         window.clear(sf::Color::Black);
 
          drawVertices();
          

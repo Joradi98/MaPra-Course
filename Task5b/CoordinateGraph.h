@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include "unit.h"
 
@@ -65,3 +67,4 @@ public:
 	}
 
 };
+
