@@ -84,14 +84,16 @@ public:
     
     
     /**
-     Keep the window open until the user closes it
+     Returns when a mouse click was recognized
      */
-    void keepRunning() {
+    void waitForMouseClick() {
         while (window.isOpen()) {
             sf::Event event;
             while (window.pollEvent(event)) {
                 if (event.type == sf::Event::Closed)
                     window.close();
+                if (event.type == sf::Event::MouseButtonReleased)
+                    return;
             }
         }
     }
@@ -125,6 +127,19 @@ public:
         vertexInfos[vertex].status = status;
         vertexInfos[vertex].gValue = cost;
         vertexInfos[vertex].hValue = estimate;
+        draw();
+    }
+    
+    ///Resets all information
+    void reset() {
+        for (unsigned int v = 0; v < graph.numVertices(); v++) {
+            vertexInfos[v].status = VertexStatus::UnknownVertex;
+        }
+        std::map<EdgeT, EdgeInformation>::iterator it;
+        for (it = edgeInfos.begin(); it != edgeInfos.end(); it++) {
+            it->second.status = EdgeStatus::UnknownEdge;
+        }
+        
         draw();
     }
     
@@ -266,8 +281,8 @@ private:
         
         
         window.draw(triangle);
-        triangle.setPosition(lineBetween(to,from,0.8));
-        window.draw(triangle);
+       // triangle.setPosition(lineBetween(to,from,0.8));
+      //  window.draw(triangle);
         
         
         //Draw text AFTERWARDS

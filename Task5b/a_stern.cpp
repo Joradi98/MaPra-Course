@@ -106,7 +106,7 @@ std::list<VertexT> A_star(DistanceGraph& g, GraphVisualizer& v, VertexT start, V
         
         //MARK all edges with their costs (will only be applicable to CoordinateGraphs, mazes dont need that shit)
         std::vector<std::pair<VertexT, CostT>> neighbors = g.getNeighbors(i);
-        for(unsigned int k = 0; i < neighbors.size(); i++){
+        for(unsigned int k = 0; k < neighbors.size(); k++){
             v.markEdge(EdgeT(i, neighbors[k].first), EdgeStatus::UnknownEdge );
         }
     }
@@ -143,6 +143,7 @@ std::list<VertexT> A_star(DistanceGraph& g, GraphVisualizer& v, VertexT start, V
 
                 //MARK optimal edge
                 v.markEdge(EdgeT(vorher, nachher), EdgeStatus::Optimal );
+                v.markEdge(EdgeT(nachher, vorher), EdgeStatus::Optimal );
 
                 //Update for next iteration
                 nachher = vorher;
@@ -245,7 +246,6 @@ void processDistance(int example) {
             visualizer = new CoordinateGraphVisualizer(700,800,graph);
         }
         
-        sf::Thread thread(&CoordinateGraphVisualizer::keepRunning,visualizer); //FIXME: UNDIEFINED BEHAVIOR UN VIRTUAL MACHINE: CHECK X11 INSTALLATION
       //  thread.launch();
         
         PruefeHeuristik(graph);
@@ -260,8 +260,9 @@ void processDistance(int example) {
                 std::list<VertexT> weg = A_star(graph, *visualizer,i, j);
                 if (weg.size() > 1) {
                   //  PruefeWeg(example, weg);
-                    visualizer->keepRunning();
+                    visualizer->waitForMouseClick(); //Have a look at that wonderful path we found
                 }
+                visualizer->reset();
             }
        }
     }
