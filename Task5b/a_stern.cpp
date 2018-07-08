@@ -245,6 +245,9 @@ void processDistance(int example) {
             visualizer = new CoordinateGraphVisualizer(700,800,graph);
         }
         
+        sf::Thread thread(&CoordinateGraphVisualizer::keepRunning,visualizer); //FIXME: UNDIEFINED BEHAVIOR UN VIRTUAL MACHINE: CHECK X11 INSTALLATION
+      //  thread.launch();
+        
         PruefeHeuristik(graph);
 
         for(VertexT i = 0; i < graph.numVertices(); i++){                //Apply Dijksstra to each vertex
@@ -257,9 +260,9 @@ void processDistance(int example) {
                 std::list<VertexT> weg = A_star(graph, *visualizer,i, j);
                 if (weg.size() > 1) {
                   //  PruefeWeg(example, weg);
+                    visualizer->keepRunning();
                 }
             }
-            visualizer->keepRunning();
        }
     }
 

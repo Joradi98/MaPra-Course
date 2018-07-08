@@ -4,6 +4,8 @@
 #include <iostream>
 #include "VisualizationUtilities.h"
 #include "CoordinateGraph.h"
+#include <thread>
+#include <future>
 
 class CoordinateGraphVisualizer : public GraphVisualizer
 {
@@ -16,6 +18,7 @@ private:
 
     std::vector<std::pair<double,double>> screenCoordinates; //Screen coordinates for the verttices
 
+    
 public:
     
     /**
@@ -65,10 +68,18 @@ public:
             screenCoordinates.push_back(std::make_pair(x,y));
         }
 
-        
-        
         //Draw the first time
         draw();
+        
+      //  std::thread t(&CoordinateGraphVisualizer::keepRunning, this);
+      //  t.join()
+        
+        // create a thread with func() as entry point
+     //   sf::Thread thread(&CoordinateGraphVisualizer::keepRunning,this);
+        // run it
+
+       
+
     }
     
     
@@ -77,7 +88,6 @@ public:
      */
     void keepRunning() {
         while (window.isOpen()) {
-
             sf::Event event;
             while (window.pollEvent(event)) {
                 if (event.type == sf::Event::Closed)
@@ -96,7 +106,7 @@ public:
     
     void markVertex(VertexT vertex, VertexStatus status) override {
         vertexInfos[vertex].status = status;
-  //      draw();
+        draw();
     }
     
     void markEdge(EdgeT e, EdgeStatus status) override {
@@ -104,70 +114,172 @@ public:
             edgeInfos[e] = EdgeInformation();
             edgeInfos[e].status = EdgeStatus::UnknownEdge;
             edgeInfos[e].cost = 0;
-            draw();
         }
-        
-        
+        edgeInfos[e].status = status;
+
+    
+        draw();
     }
     
     void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status) override {
         vertexInfos[vertex].status = status;
         vertexInfos[vertex].gValue = cost;
         vertexInfos[vertex].hValue = estimate;
-//        draw();
+        draw();
     }
     
     
     void draw() override {
+       // sf::sleep(sf::milliseconds(10));
         window.clear(sf::Color::Black);
         drawVertices();
         drawEdges();
-      //  std::cout << "Drawing..." << std::endl;
+    //    std::cout << "Drawing..." << std::endl;
 
         
         window.display();
     }
 private:
-    
-    void drawVertices() {
-        sf::CircleShape shape(10);
-        shape.setOrigin(shape.getRadius(), shape.getRadius());
-
-       // shape.setOrigin(0, 0);
-        shape.setFillColor(sf::Color(255, 255, 255));   //Done: White
-     //   shape.setSize(sf::Vector2f(20,20));
-
-        
-        for (unsigned int v = 0; v < graph.numVertices(); v++) {
-            shape.setPosition(screenCoordinates[v].first,screenCoordinates[v].second);
-            window.draw(shape);
-        }
+    /// Returns the point on the line when traversing it from ratio=0 to ratio=1.
+    sf::Vector2f lineBetween(VertexT v1, VertexT v2, double ratio) {
+        return sf::Vector2f(screenCoordinates[v1].first+ratio*(screenCoordinates[v2].first-screenCoordinates[v1].first),
+                            screenCoordinates[v1].second+ratio*(screenCoordinates[v2].second-screenCoordinates[v1].second)
+                            );
     }
     
     
-    void drawEdges() {
+    void drawVertices() {
+
         
+        for (unsigned int v = 0; v < graph.numVertices(); v++) {
+
+            switch (vertexInfos[v].status) {
+                case VertexStatus::UnknownVertex:
+                    drawVertex(v, sf::Color(100, 100, 100)); //Unknown: Grey
+                    break;
+                case VertexStatus::Destination:
+                    drawVertex(v, sf::Color(60, 30, 114));   //Destination: Violett
+                    break;
+                case VertexStatus::Active:
+                    drawVertex(v,sf::Color(220, 40, 40));   //Active: Red
+                    break;
+                case VertexStatus::InQueue:
+                    drawVertex(v,sf::Color(110, 210, 250));   //In Queue: Blue
+                    break;
+                case VertexStatus::Done:
+                    drawVertex(v,sf::Color(255, 255, 255));   //Done: White
+                    break;
+
+                default:
+                    break;
+            }
+            
+
+        }
+    }
+    
+    // No logic - just drawing
+    void drawVertex(VertexT v, sf::Color color) {
+        sf::CircleShape shape(10);
+        shape.setOrigin(shape.getRadius(), shape.getRadius());
+        shape.setFillColor(color);   //Done: White
+        
+        sf::Text text;
+        text.setFont(font);
+
+        shape.setPosition(screenCoordinates[v].first,screenCoordinates[v].second);
+        window.draw(shape);
+        
+        
+        //Draw text AFTERWARDS
+        if ( SHOULD_DISPLAY_TEXT ) {
+            text.setString(std::to_string(vertexInfos[v].gValue) + "\n" + std::to_string(vertexInfos[v].hValue));
+            text.setCharacterSize(12); // in pixels, not points!
+            text.setOrigin(0, 0);
+            text.setPosition(shape.getPosition());
+            text.setFillColor(color);
+            window.draw(text);
+        }
+
+        
+        
+    }
+    
+    
+    
+    
+    void drawEdges() {
+
         for (auto const& keyValuePair : edgeInfos) {
             EdgeT edge = keyValuePair.first;
             EdgeInformation info = keyValuePair.second;
 
-            sf::Vertex line[] =
-            {
-                sf::Vertex(sf::Vector2f(screenCoordinates[edge.first].first, screenCoordinates[edge.first].second)),
-                sf::Vertex(sf::Vector2f(screenCoordinates[edge.second].first, screenCoordinates[edge.second].second))
-            };
             
-            window.draw(line, 2, sf::Lines);
-
-            
-            
+            switch (info.status) {
+                case EdgeStatus::UnknownEdge:
+                    drawEdge(edge.first, edge.second, sf::Color(100, 100, 100), info.cost); //Unknown: Grey
+                    break;
+                case EdgeStatus::Active:
+                    drawEdge(edge.first, edge.second, sf::Color(110, 210, 250), info.cost); //Active: Light blue
+                    break;
+                case EdgeStatus::Visited:
+                    drawEdge(edge.first, edge.second, sf::Color::White, info.cost);         //Visited: White
+                    break;
+                case EdgeStatus::Optimal:
+                    drawEdge(edge.first, edge.second, sf::Color::Green, info.cost);         //Optimal: Green
+                default:
+                    break;
+            }
             
         }
-        
-        
-        
     }
     
+    // No logic - just drawing
+    void drawEdge(VertexT from, VertexT to, sf::Color color, double cost) {
+        sf::Text text;
+        text.setFont(font);
+        
+        sf::CircleShape triangle(5, 3);
+
+        
+        
+  /*      sf::Vertex line[] =
+        {
+            sf::Vertex(lineBetween(from,to,0)),
+            sf::Vertex(lineBetween(from,to,1))
+        };
+        line[0].color = color;
+        line[1].color = color;
+        
+        window.draw(line, 2, sf::Lines);*/
+        
+        sf::VertexArray line(sf::Lines, 2);
+        line[0].position = lineBetween(from,to,0);
+        line[0].color = color;
+        line[1].position = lineBetween(from,to,1);
+        line[1].color = color;
+        window.draw(line);
+        
+        triangle.setOrigin(triangle.getRadius(), triangle.getRadius());
+        triangle.setFillColor(color);
+        triangle.setPosition(lineBetween(from,to,0.8));
+        
+        
+        window.draw(triangle);
+        triangle.setPosition(lineBetween(to,from,0.8));
+        window.draw(triangle);
+        
+        
+        //Draw text AFTERWARDS
+        if ( SHOULD_DISPLAY_COSTS ) {
+            text.setString(std::to_string(cost));
+            text.setCharacterSize(10); // in pixels, not points!
+            text.setOrigin(0, 0);
+            text.setPosition(lineBetween(from,to,0.5));
+            text.setFillColor(sf::Color::Red);
+            window.draw(text);
+        }
+    }
     
     
     

@@ -5,6 +5,10 @@
 #define RAD2DEG(a)   ((a) * (180 / M_PI))
 #define EARTH_RADIUS 6378137
 
+#define SHOULD_DISPLAY_TEXT 1
+#define SHOULD_DISPLAY_COSTS 1
+
+
 ///A struct storing information relevant for drawing a vertex
 struct VertexInformation {
     VertexStatus status;

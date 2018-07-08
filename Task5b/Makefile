@@ -1,7 +1,7 @@
 CXX      = g++
 CXXFLAGS = -std=c++11 -g -O2 -Ilib/SFML-2.5.0/include/ -D_GLIBCXX_USE_CXX11_ABI=0
 
-LIBS = -Llib/SFML-2.5.0/lib/ -lsfml-graphics -lsfml-window -lsfml-system
+LIBS = -Llib/SFML-2.5.0/lib/ -lsfml-graphics -lsfml-window -lsfml-system -pthread  
 
 .PHONY: clean run debug gdb run_test
 

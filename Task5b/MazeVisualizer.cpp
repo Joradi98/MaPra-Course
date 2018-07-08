@@ -5,7 +5,6 @@
 #include "VisualizationUtilities.h"
 #include <SFML/Graphics.hpp>
 
-#define SHOULD_DISPLAY_TEXT 0
 
 
 class MazeVisualizer : public GraphVisualizer
