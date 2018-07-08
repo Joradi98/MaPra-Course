@@ -164,8 +164,14 @@ public:
 
 		double xDifference = (firstCoordinate.first-secondCoordinate.first);
 		double yDifference = (firstCoordinate.second-secondCoordinate.second);
-		return  fabs(xDifference) + fabs(yDifference);
-	}
+		
+        return    0;                                                          //0 Distance
+        //return    fabs(xDifference) + fabs(yDifference);                      //Manhattan Distance
+        //return    sqrt(xDifference*xDifference + yDifference*yDifference);    //Euclidean Distance
+        //return    2*sqrt(xDifference*xDifference + yDifference*yDifference);  //Scaled Euclidean Distance
+
+    
+    }
     
     
     CellType typeOfCell(VertexT vertex) {

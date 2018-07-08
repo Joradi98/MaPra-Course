@@ -312,8 +312,10 @@ void processMaze(int example) {
         srand(time(NULL));
         int seed = rand();
         std::cout << "Using seed " << seed << std::endl;
-        std::vector<CellType> mazeData = ErzeugeLabyrinth(10, 10 , seed);
-        MazeGraph graph(mazeData,10,10);              //Randomly generated maze
+        
+        std::pair<int, int> labyrinthSize = std::make_pair(20,20);
+        std::vector<CellType> mazeData = ErzeugeLabyrinth(labyrinthSize.first, labyrinthSize.second , seed);
+        MazeGraph graph(mazeData,labyrinthSize.first,labyrinthSize.second);              //Randomly generated maze
         MazeVisualizer visualizer(1000,1000,graph);
 
         PruefeHeuristik(graph);
