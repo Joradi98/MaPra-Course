@@ -115,7 +115,7 @@ public:
         if ( edgeInfos.count(e) == 0 ) { //Create an empty record first
             edgeInfos[e] = EdgeInformation();
             edgeInfos[e].status = EdgeStatus::UnknownEdge;
-            edgeInfos[e].cost = 0;
+            edgeInfos[e].cost = graph.cost(e.first,e.second);
         }
         edgeInfos[e].status = status;
 
@@ -256,18 +256,7 @@ private:
         
         sf::CircleShape triangle(5, 3);
 
-        
-        
-  /*      sf::Vertex line[] =
-        {
-            sf::Vertex(lineBetween(from,to,0)),
-            sf::Vertex(lineBetween(from,to,1))
-        };
-        line[0].color = color;
-        line[1].color = color;
-        
-        window.draw(line, 2, sf::Lines);*/
-        
+
         sf::VertexArray line(sf::Lines, 2);
         line[0].position = lineBetween(from,to,0);
         line[0].color = color;
@@ -281,8 +270,6 @@ private:
         
         
         window.draw(triangle);
-       // triangle.setPosition(lineBetween(to,from,0.8));
-      //  window.draw(triangle);
         
         
         //Draw text AFTERWARDS
