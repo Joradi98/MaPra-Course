@@ -305,8 +305,11 @@ void processMaze(int example) {
             auto goal  = pair.second;
             std::list<VertexT> weg = A_star(graph, visualizer, start, goal );
             PruefeWeg(example, weg);
+            
+            visualizer.waitForMouseClick();
+            visualizer.reset();
         }
-        visualizer.keepRunning();
+        
 
     } else {
         //generate random maze

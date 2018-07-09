@@ -100,6 +100,19 @@ public:
         }
     }
 
+    ///Resets all information
+    void reset() {
+        for (unsigned int v = 0; v < graph.numVertices(); v++) {
+            vertexInfos[v].status = VertexStatus::UnknownVertex;
+        }
+        std::map<EdgeT, EdgeInformation>::iterator it;
+        for (it = edgeInfos.begin(); it != edgeInfos.end(); it++) {
+            it->second.status = EdgeStatus::UnknownEdge;
+        }
+        
+        draw();
+    }
+    
     
     void markVertex(VertexT vertex, VertexStatus status,  bool updateGraphic=true) override {
         vertexInfos[vertex].status = status;
@@ -129,18 +142,7 @@ public:
             draw();
     }
     
-    ///Resets all information
-    void reset() {
-        for (unsigned int v = 0; v < graph.numVertices(); v++) {
-            vertexInfos[v].status = VertexStatus::UnknownVertex;
-        }
-        std::map<EdgeT, EdgeInformation>::iterator it;
-        for (it = edgeInfos.begin(); it != edgeInfos.end(); it++) {
-            it->second.status = EdgeStatus::UnknownEdge;
-        }
-        
-        draw();
-    }
+    
     
     
     void draw() override {

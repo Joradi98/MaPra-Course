@@ -10,7 +10,7 @@
  > 1 will cause only the Nth simulation step to be drawn    => faster
  < 0 will pause for -N milliseconds                        => slower
  */
-#define GRAPHIC_ACCELERATION 3
+#define GRAPHIC_ACCELERATION 20
 
 /**
 1 - Manhatten Distance

@@ -77,6 +77,33 @@ public:
         
     }
     
+    /**
+     Returns when a mouse click was recognized
+     */
+    void waitForMouseClick() {
+        while (window.isOpen()) {
+            sf::Event event;
+            while (window.pollEvent(event)) {
+                if (event.type == sf::Event::Closed)
+                    window.close();
+                if (event.type == sf::Event::MouseButtonReleased)
+                    return;
+            }
+        }
+    }
+    
+    ///Resets all information
+    void reset() {
+        for (unsigned int v = 0; v < graph.numVertices(); v++) {
+            vertices[v].status = VertexStatus::UnknownVertex;
+        }
+        markedEdges.clear();
+        
+        draw();
+    }
+    
+    
+    
     //MARK: Vertices
     
     /**
