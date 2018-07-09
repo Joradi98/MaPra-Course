@@ -4,6 +4,7 @@
 #include <iostream>
 #include "VisualizationUtilities.h"
 #include "CoordinateGraph.h"
+#include "Constants.h"              //SHOULD_DRAW_TEXT
 #include <thread>
 #include <future>
 
@@ -106,12 +107,13 @@ public:
     
     //implement draw() method
     
-    void markVertex(VertexT vertex, VertexStatus status) override {
+    void markVertex(VertexT vertex, VertexStatus status,  bool updateGraphic=true) override {
         vertexInfos[vertex].status = status;
-        draw();
+        if (updateGraphic == true)
+            draw();
     }
     
-    void markEdge(EdgeT e, EdgeStatus status) override {
+    void markEdge(EdgeT e, EdgeStatus status,  bool updateGraphic=true) override {
         if ( edgeInfos.count(e) == 0 ) { //Create an empty record first
             edgeInfos[e] = EdgeInformation();
             edgeInfos[e].status = EdgeStatus::UnknownEdge;
@@ -120,14 +122,17 @@ public:
         edgeInfos[e].status = status;
 
     
-        draw();
+        if (updateGraphic == true)
+            draw();
     }
     
-    void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status) override {
+    void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status,  bool updateGraphic=true) override {
         vertexInfos[vertex].status = status;
         vertexInfos[vertex].gValue = cost;
         vertexInfos[vertex].hValue = estimate;
-        draw();
+        
+        if (updateGraphic == true)
+            draw();
     }
     
     ///Resets all information
@@ -145,15 +150,12 @@ public:
     
     
     void draw() override {
-       // sf::sleep(sf::milliseconds(10));
         window.clear(sf::Color::Black);
         drawVertices();
         drawEdges();
-    //    std::cout << "Drawing..." << std::endl;
-
-        
         window.display();
     }
+    
 private:
     /// Returns the point on the line when traversing it from ratio=0 to ratio=1.
     sf::Vector2f lineBetween(VertexT v1, VertexT v2, double ratio) {
@@ -164,10 +166,7 @@ private:
     
     
     void drawVertices() {
-
-        
         for (unsigned int v = 0; v < graph.numVertices(); v++) {
-
             switch (vertexInfos[v].status) {
                 case VertexStatus::UnknownVertex:
                     drawVertex(v, sf::Color(100, 100, 100)); //Unknown: Grey
@@ -188,8 +187,6 @@ private:
                 default:
                     break;
             }
-            
-
         }
     }
     
@@ -205,7 +202,6 @@ private:
         shape.setPosition(screenCoordinates[v].first,screenCoordinates[v].second);
         window.draw(shape);
         
-        
         //Draw text AFTERWARDS
         if ( SHOULD_DISPLAY_TEXT ) {
             text.setString(std::to_string(vertexInfos[v].gValue) + "\n" + std::to_string(vertexInfos[v].hValue));
@@ -215,16 +211,12 @@ private:
             text.setFillColor(color);
             window.draw(text);
         }
-
-        
-        
     }
     
     
     
     
     void drawEdges() {
-
         for (auto const& keyValuePair : edgeInfos) {
             EdgeT edge = keyValuePair.first;
             EdgeInformation info = keyValuePair.second;
@@ -256,7 +248,6 @@ private:
         
         sf::CircleShape triangle(5, 3);
 
-
         sf::VertexArray line(sf::Lines, 2);
         line[0].position = lineBetween(from,to,0);
         line[0].color = color;
@@ -270,8 +261,7 @@ private:
         
         
         window.draw(triangle);
-        
-        
+
         //Draw text AFTERWARDS
         if ( SHOULD_DISPLAY_COSTS ) {
             text.setString(std::to_string(cost));

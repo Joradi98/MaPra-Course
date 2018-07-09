@@ -8,6 +8,7 @@
 #include "BasicStaticGraph.h"
 #include "CoordinateGraph.h"
 #include "MazeGraph.h"
+#include "Constants.h"  // RANDOM_MAZE_SIZE
 #include "MazeVisualizer.cpp"
 #include "CoordinateGraphVisualizer.cpp"
 #include <SFML/Graphics.hpp>
@@ -107,7 +108,7 @@ std::list<VertexT> A_star(DistanceGraph& g, GraphVisualizer& v, VertexT start, V
         //MARK all edges with their costs (will only be applicable to CoordinateGraphs, mazes dont need that shit)
         std::vector<std::pair<VertexT, CostT>> neighbors = g.getNeighbors(i);
         for(unsigned int k = 0; k < neighbors.size(); k++){
-            v.markEdge(EdgeT(i, neighbors[k].first), EdgeStatus::UnknownEdge );
+            v.markEdge(EdgeT(i, neighbors[k].first), EdgeStatus::UnknownEdge , false);
         }
     }
     //MARK destination
@@ -179,12 +180,12 @@ std::list<VertexT> A_star(DistanceGraph& g, GraphVisualizer& v, VertexT start, V
 
             }
             
-            
             double tentative_gScore = gScore.at(current) + g.cost(current, neighbor);
             
 
             //MARK Visited edge
             v.markEdge(EdgeT(current, neighbor), EdgeStatus::Visited );
+            v.markEdge(EdgeT(neighbor, current), EdgeStatus::Visited );
 
             if (tentative_gScore >= gScore.at(neighbor) ) {
                 continue;
@@ -313,7 +314,7 @@ void processMaze(int example) {
         int seed = rand();
         std::cout << "Using seed " << seed << std::endl;
         
-        std::pair<int, int> labyrinthSize = std::make_pair(20,20);
+        std::pair<int, int> labyrinthSize = std::make_pair(RANDOM_MAZE_SIZE,RANDOM_MAZE_SIZE);
         std::vector<CellType> mazeData = ErzeugeLabyrinth(labyrinthSize.first, labyrinthSize.second , seed);
         MazeGraph graph(mazeData,labyrinthSize.first,labyrinthSize.second);              //Randomly generated maze
         MazeVisualizer visualizer(1000,1000,graph);

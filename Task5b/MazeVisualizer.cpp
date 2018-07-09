@@ -2,7 +2,8 @@
 #include "unit.h"
 #include <iostream>
 #include "MazeGraph.h"
-#include "VisualizationUtilities.h"
+#include "VisualizationUtilities.h" //Map projection
+#include "Constants.h"              //SHOULD_DRAW_TEXT
 #include <SFML/Graphics.hpp>
 
 
@@ -59,43 +60,55 @@ public:
 
     
 
-    
-    //hold reference to graoh and costs, and whatever
-    
-    //implement draw() method
-     void draw() {
-         //reset to black
+    void draw() override {
          window.clear(sf::Color::Black);
-
          drawVertices();
-         
-         //draw edges?
          drawEdges();
-         //draw path?
-
          window.display();
     }
     
+    //MARK: Vertices
     
-    void markVertex(VertexT vertex, VertexStatus status) override {
+    /**
+     Convenience method: Sometimes you may wish to only update the data, but draw at a later point.
+     */
+    void markVertex(VertexT vertex, VertexStatus status, bool updateGraphic=true) override {
         vertices[vertex].status = status;
-        draw();
+        if (updateGraphic == true)
+            draw();
     }
+
     
-    void markEdge(EdgeT e, EdgeStatus status) override {
-        
-        if ( status == EdgeStatus::Optimal ) {
-            markedEdges.push_back(e);
-        }
-        draw();
-    }
-    
-    void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status) override {
+    /**
+     Convenience method: Sometimes you may wish to only update the data, but draw at a later point
+     */
+    void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status, bool updateGraphic=true) override  {
         vertices[vertex].status = status;
         vertices[vertex].gValue = cost;
         vertices[vertex].hValue = estimate;
-        draw();
+        
+        if (updateGraphic == true)
+            draw();
     }
+    
+ 
+    //MARK: Edges
+    
+    /**
+     Convenience method: Sometimes you may wish to only update the data, but draw at a later point
+     */
+    void markEdge(EdgeT e, EdgeStatus status, bool updateGraphic=true) override {
+        if ( status == EdgeStatus::Optimal ) {
+            markedEdges.push_back(e);
+        }
+        
+        if (updateGraphic == true)
+            draw();
+    }
+    
+
+    
+    
     
 
 private:
@@ -125,15 +138,9 @@ private:
             shape.setOutlineThickness(1); // creates an outline around the circle
             shape.setFillColor(sf::Color(220, 40, 40));   //Active: Red
 
-            //Display
             window.draw(shape);
-
         }
-        
-        
     }
-    
-    
     
     void drawVertices() {
         //Create a rectangle for each node

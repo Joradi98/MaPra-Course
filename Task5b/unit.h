@@ -130,13 +130,13 @@ class GraphVisualizer
     virtual ~GraphVisualizer() {}
 
     // Zeige an, dass sich ein Knoten jetzt in dem angegebenen Zustand befindet.
-    virtual void markVertex(VertexT vertex, VertexStatus status) = 0;
+    virtual void markVertex(VertexT vertex, VertexStatus status, bool updateGraphic=true) = 0;
     
     // Zeige an, dass sich eine Kante im angegebenen Zustand befindet.
-    virtual void markEdge(EdgeT e, EdgeStatus status) = 0;
+    virtual void markEdge(EdgeT e, EdgeStatus status, bool updateGraphic=true) = 0;
     
     // Aktualisiere jegliche Daten eines Knotens.
-    virtual void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status) = 0;
+    virtual void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status, bool updateGraphic=true) = 0;
     
     // Zeichne den aktuellen Zustand des Graphen.
     virtual void draw() = 0;

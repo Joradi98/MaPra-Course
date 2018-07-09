@@ -22,7 +22,7 @@ class TextVisualizer : public GraphVisualizer
         
     }
     
-    void markVertex(VertexT vertex, VertexStatus status) override {
+    void markVertex(VertexT vertex, VertexStatus status,  bool updateGraphic=true) override {
         static const char* TEXT[] = {
             "Unbekannt", "In Queue", "Aktiv", "Fertig", "Ziel"
         };
@@ -30,7 +30,7 @@ class TextVisualizer : public GraphVisualizer
         std::cerr << "VERTEX " << vertex << " - Neuer Status: " << TEXT[static_cast<int>(status)]  << '\n';
     }
     
-    void markEdge(EdgeT e, EdgeStatus status) override {
+    void markEdge(EdgeT e, EdgeStatus status,  bool updateGraphic=true) override {
         static const char* TEXT[] = {
             " - Unbekannt", " - Besucht", " - Aktiv", " - Optimal"
         };
@@ -38,7 +38,7 @@ class TextVisualizer : public GraphVisualizer
         std::cerr << "KANTE  (" << e.first << ", " << e.second << ")" << TEXT[static_cast<int>(status)]  << '\n';
     }
     
-    void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status) override {
+    void updateVertex(VertexT vertex, double cost, double estimate, VertexT parent, VertexStatus status,  bool updateGraphic=true) override {
         static const char* TEXT[] = {
             " - Unbekannt", " - In Queue", " - Aktiv", " - Fertig", " - Ziel"
         };

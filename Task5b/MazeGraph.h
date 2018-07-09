@@ -1,6 +1,6 @@
 #include <iostream>
 #include "unit.h"
-
+#include "Constants.h" //MAZE_HEURISTIC
 
 #ifndef MAZEGRAPH_H
 #define MAZEGRAPH_H
@@ -165,10 +165,20 @@ public:
 		double xDifference = (firstCoordinate.first-secondCoordinate.first);
 		double yDifference = (firstCoordinate.second-secondCoordinate.second);
 		
-        return    0;                                                          //0 Distance
-        //return    fabs(xDifference) + fabs(yDifference);                      //Manhattan Distance
-        //return    sqrt(xDifference*xDifference + yDifference*yDifference);    //Euclidean Distance
-        //return    2*sqrt(xDifference*xDifference + yDifference*yDifference);  //Scaled Euclidean Distance
+        switch (MAZE_HEURISTIC) {
+            case 1:
+                return fabs(xDifference) + fabs(yDifference);                      //Manhattan Distance
+                break;
+            case 2:
+                return sqrt(xDifference*xDifference + yDifference*yDifference);    //Euclidean Distance
+                break;
+            case 3:
+                return 2*sqrt(xDifference*xDifference + yDifference*yDifference);  //Scaled Euclidean Distance
+                break;
+            default:
+                return 0;                                                          //0 Distance
+                break;
+        }
 
     
     }
