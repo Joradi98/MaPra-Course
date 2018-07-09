@@ -7,7 +7,6 @@
 #include <SFML/Graphics.hpp>
 
 
-
 class MazeVisualizer : public GraphVisualizer
 {
 private:
@@ -16,6 +15,8 @@ private:
     std::vector<VertexInformation> vertices;    /// Drawable information for each vertex
     std::vector<EdgeT> markedEdges;             /// Edges that should be highlighted (i.e. the successfull path at the end)
     sf::Font font;
+
+    int simulationStep = 0;                     // Used for graphic acceleration. Count the current step
 
 public:
 
@@ -34,7 +35,6 @@ public:
         if (!font.loadFromFile("font/BebasNeue-Regular.ttf")) {
             std::cout << "Error on loading font!" << std::endl;
         }
-        
         
         
         draw();
@@ -61,10 +61,20 @@ public:
     
 
     void draw() override {
-         window.clear(sf::Color::Black);
-         drawVertices();
-         drawEdges();
-         window.display();
+        
+        if (GRAPHIC_ACCELERATION > 1) {
+            simulationStep = (simulationStep + 1) % GRAPHIC_ACCELERATION;
+        } else if (GRAPHIC_ACCELERATION < 0) {
+            sf::sleep(sf::milliseconds(-GRAPHIC_ACCELERATION));
+        }
+        
+        if (simulationStep == 0) {
+            window.clear(sf::Color::Black);
+            drawVertices();
+            drawEdges();
+            window.display();
+        }
+        
     }
     
     //MARK: Vertices

@@ -179,8 +179,6 @@ public:
                 return 0;                                                          //0 Distance
                 break;
         }
-
-    
     }
     
     

@@ -19,7 +19,8 @@ private:
 
     std::vector<std::pair<double,double>> screenCoordinates; //Screen coordinates for the verttices
 
-    
+    int simulationStep = 0;                     // Used for graphic acceleration. Count the current step
+
 public:
     
     /**
@@ -100,13 +101,6 @@ public:
     }
 
     
-    
-    
-    //Convert long/lat coordinates to coordinates within the plane
-    
-    
-    //implement draw() method
-    
     void markVertex(VertexT vertex, VertexStatus status,  bool updateGraphic=true) override {
         vertexInfos[vertex].status = status;
         if (updateGraphic == true)
@@ -150,10 +144,17 @@ public:
     
     
     void draw() override {
-        window.clear(sf::Color::Black);
-        drawVertices();
-        drawEdges();
-        window.display();
+        if (GRAPHIC_ACCELERATION > 1) {
+            simulationStep = (simulationStep + 1) % GRAPHIC_ACCELERATION;
+        } else if (GRAPHIC_ACCELERATION < 0) {
+            sf::sleep(sf::milliseconds(-GRAPHIC_ACCELERATION));
+        }
+        if (simulationStep == 0) {
+            window.clear(sf::Color::Black);
+            drawVertices();
+            drawEdges();
+            window.display();
+        }
     }
     
 private:

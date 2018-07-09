@@ -6,9 +6,16 @@
 #define RANDOM_MAZE_SIZE 30
 
 /**
+ Must be int
+ > 1 will cause only the Nth simulation step to be drawn    => faster
+ < 0 will pause for -N milliseconds                        => slower
+ */
+#define GRAPHIC_ACCELERATION 3
+
+/**
 1 - Manhatten Distance
 2 - Euclidean Distance
-3 - Scaled Euclidean Distance (1.7*Euclidean)
+3 - Scaled Euclidean Distance (2*Euclidean)
 default - 0 Distance
  */
-#define MAZE_HEURISTIC 3
+#define MAZE_HEURISTIC 1
