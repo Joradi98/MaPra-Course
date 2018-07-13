@@ -55,7 +55,7 @@ double summiertesTrapezIntegral(double a, double b, double eps) {
 	sum += 0.5*h*getFValue(a);
 	sum += 0.5*h*getFValue(b);
 	for (int j = 1; j < n-1; j++) {
-		sum += h*f(a+j*h);
+		sum += h*getFValue(a+j*h);
 	}
 
 	return sum;
