@@ -3,7 +3,7 @@ This repository serves as a collection of all the tasks from the "Mathematisches
 
 
 | Task          | Topic           
-| ------------- |:-------------
+| :------------- |:-------------
 | Project 1        | Reducing calculation errors in finding roots of quadratic polynomials 
 | Project 2        | Various sorting algorithms      
 | Project 3        | Iterative solvers for systems of equations (Conjugated gradients, Gauss-Seidel, Jacobi)      
