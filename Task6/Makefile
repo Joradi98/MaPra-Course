@@ -1,4 +1,4 @@
-CXXFLAGS = -Wall -pedantic
+ CXXFLAGS = -Wall -pedantic
 LIBS  = -lGL -lpthread -lX11
 
 all: loesung
